@@ -1,8 +1,8 @@
 from putwall.putwall import PutWall, PutSlot
-from totes.totes import Tote, Compartment
+from cartons.cartons import Carton
 from skus.skus import SKU
 from orders.orders import Order, Line
-from logic.putwalloptimization import assign_store, add_tote_to_queue, get_top_stores
+from logic.putwalloptimization import assign_store, assign_carton, get_top_stores
 import sqlalchemy as sa
 import pandas as pd
 import numpy as np
@@ -17,7 +17,7 @@ ItemMaster_table = 'dbo.tblItemMaster'
 def print_timer(start, label=''):
     time_ttl = round(time.time()-start, 2)
     label_len = len(label)
-    buffer = '-'*max(85-label_len, 0)
+    buffer = '-'*max(30-label_len, 0)
     print('{0}{1} Elapsed Time {2} seconds'.format(label, buffer, time_ttl))
     return time.time()
 
@@ -28,9 +28,10 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
 
     ## Initialize orders
     orders = {}
-    sql_query = '''select TOP 10000 ShipTo as store,
+    sql_query = '''select ShipTo as store,
                     sku,
-                    UnitQty_Future as units
+                    UnitQty_Future as units,
+                    0 as fulfilled
                     From {}
                     Where ShipDate = '{}'
                    Order by ShipTo, SKU'''.format(order_table, date)
@@ -55,7 +56,11 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             if top_stores:
                 order_id = top_stores.pop(0)
                 orders[order_id].allocated = True
-                put_walls[pw].add_slot(PutSlot(id=ps, capacity=np.random.randint(25, 35), order=order_id, active=True))
+                put_walls[pw].add_slot(PutSlot(id=ps,
+                                               capacity=np.random.randint(25, 35),
+                                               order=order_id,
+                                               active=True,
+                                               alloc_lines=orders[order_id].lines))
             else:
                 put_walls[pw].add_slot(PutSlot(id=ps, capacity=np.random.randint(25, 35)))
 
@@ -96,74 +101,68 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     start = print_timer(start, 'Initialized Item Master')
 
     ## Intialize inventory
-    totes = {}
-    inventory = pd.DataFrame(index=None,
-                             columns=['Tote_id', 'Sku_id', 'Tote_Qty', 'Inv_Qty', 'Active', 'loop_activated'],
+    cartons = {}
+    inventory_table = pd.DataFrame(index=None,
+                             columns=['tote_id', 'sku_id', 'tote_qty', 'inv_qty', 'active', 'loop_activated'],
                              dtype=int)
     units = item_master_data
     ttl_units = np.sum(units.loc[:, 'Units'])
-    tote_id = 0
-
-    start = print_timer(start, 'Initialized inventory')
+    carton_id = 0
 
     for sku in sku_list:
         while units.loc[sku, 'Units'] > 0:
             units_per_case = units.loc[sku, 'unitspercase']
-            totes[tote_id] = Tote(tote_id, active=item_master[sku].active)
-            totes[tote_id].add_compartment(Compartment(id=1,
-                                                      sku=sku,
-                                                      quantity=units_per_case,
-                                                      active=True))
+            cartons[carton_id] = Carton(carton_id, active=item_master[sku].active, sku=sku, quantity=units_per_case)
             units.loc[sku, 'Units'] -= min(units_per_case, units.loc[sku, 'Units'])
-            tote_id += 1
-    print('{} Totes created.'.format(len(totes)))
+            carton_id += 1
+    print('{} Cartons created.'.format(len(cartons)))
 
     start = print_timer(start, 'Initialized Totes')
 
-    for i in range(100):
-        count_tote_pulls = 0
-        for pw in put_walls.values():
-            print(pw.id)
-            print(pw.fill_from_queue(1))
+    count_tote_pulls = 0
 
-            #start = print_timer(start, 'Fill from queue')
+    for i in range(100):
+        print('Loop: {}\nTote Pulls: {}'.format(i, count_tote_pulls))
+
+        for pw in put_walls.values():
+            pw.fill_from_queue(1)
 
             empty_slots = []
-            for id, slot in pw.slots.items():
+            for slot in pw.slots.values():
                 if slot.is_clear():
+                    print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
                     if slot.order in orders:
-                        orders[slot.order] = slot.allocation ##TODO ensure order slotted to single slot
+                        orders[slot.order].lines = slot.alloc_lines
+                        if sum([l.quantity for l in orders[slot.order].lines]) == 0:
+                            del orders[slot.order]
+                            print('Order closed: {}'.format(slot.order))
+                        orders[slot.order].allocated = False
                     slot.clear()
                     empty_slots.append(slot)
 
-            #start = print_timer(start, 'Clear slots')
-
             for slot in empty_slots:
-                store, lines = assign_store(pw=pw, orders=orders, item_master=item_master,
-                                         totes=totes, put_walls=put_walls)
+                store, lines = assign_store(pw=pw,
+                                            orders=orders,
+                                            cartons=cartons)
 
                 if store is None:
                     break
 
-                #start = print_timer(start, 'Assign store')
-
                 slot.assign(order=store, alloc_lines=lines)
+                orders[store].allocated = True
+                print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
 
-                #start = print_timer(start, 'Assign slot')
-
-            if pw.add_to_queue(add_tote_to_queue(pw=pw, orders=orders, item_master=item_master,
-                                                 totes=totes, put_walls=put_walls)):
+            carton = assign_carton(pw=pw, orders=orders, cartons=cartons)
+            if carton:
+                pw.add_to_queue(carton)
+                print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_tote_pulls += 1
 
-            #start = print_timer(start, 'Assign SKU')
-
             ##TODO add sku release
-    count_tote_returns = count_tote_pulls = len([t for t in totes.values() if t.active == False])
-    print('Tote Pulls: {}'.format(count_tote_pulls))
-    print('Tote Returns: {}'.format(count_tote_returns))
-    print('Total Tote Moves: {}'.format(count_tote_pulls+count_tote_returns))
-
-
+    count_tote_returns = count_tote_pulls = len([t for t in cartons.values() if t.active == False])
+    print('Carton Pulls: {}'.format(count_tote_pulls))
+    print('Carton Returns: {}'.format(count_tote_returns))
+    print('Carton Tote Moves: {}'.format(count_tote_pulls+count_tote_returns))
 
 if __name__ == '__main__':
     run_model()

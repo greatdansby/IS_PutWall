@@ -27,7 +27,9 @@ class PutWall:
                     slot.update_quantity(qty=qty_moved)
                     slot.update_allocation(sku=sku, qty=-qty_moved)
                     tote.update_quantity(sku=sku, qty=-qty_moved)
-                    log.append({'qty_moved': qty_moved, 'slot_id': slot.id, 'tote_id': tote.id})
+                    if tote.is_empty():
+                        tote.active = False
+                    log.append('{} of {} moved from tote {} to order {}'.format(qty_moved, sku, tote.id, slot.order))
         return log
 
     def clear_empty_slots(self):
