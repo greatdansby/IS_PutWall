@@ -1,8 +1,9 @@
 class Tote:
-    def __init__(self, num_compartments=1, active=True):
+    def __init__(self, id, num_compartments=1, active=True):
         self.num_compartments = num_compartments
         self.compartments = {}
         self.active = active
+        self.id = id
 
     def add_compartment(self, compartment):
         if len(self.compartments) >= self.num_compartments:

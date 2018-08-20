@@ -2,6 +2,7 @@ class Order:
     def __init__(self, id):
         self.id = id
         self.lines = []
+        self.allocated = False
 
     def add_line(self, line):
         self.lines.append(line)

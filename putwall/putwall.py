@@ -16,6 +16,7 @@ class PutWall:
         return False
 
     def fill_from_queue(self, num_totes):
+        log = []
         for tote in self.queue[:num_totes]:
             for sku in tote.get_contents():
                 for slot in self.find_slots(sku=sku):
@@ -26,6 +27,8 @@ class PutWall:
                     slot.update_quantity(qty=qty_moved)
                     slot.update_allocation(sku=sku, qty=-qty_moved)
                     tote.update_quantity(sku=sku, qty=-qty_moved)
+                    log.append({'qty_moved': qty_moved, 'slot_id': slot.id, 'tote_id': tote.id})
+        return log
 
     def clear_empty_slots(self):
         empty_slots = []
@@ -42,15 +45,25 @@ class PutWall:
                 found_slots.append(slot)
         return found_slots
 
+    def get_allocation(self):
+        allocation = {}
+        for slot in [s for s in self.slots.values() if s.active]:
+            for line in slot.alloc_lines:
+                if line.sku in allocation:
+                    allocation[line.sku] += line.quantity
+                else:
+                    allocation[line.sku] = line.quantity
+        return allocation
+
 
 class PutSlot:
-    def __init__(self, id, alloc_lines=None, capacity=0, quantity=0):
+    def __init__(self, id, alloc_lines=None, capacity=0, quantity=0, active=False, order=None):
         self.id = id
-        self.active = False
+        self.active = active
         self.capacity = capacity
         self.quantity = quantity
         self.alloc_lines = alloc_lines
-        self.order = None
+        self.order = order
 
     def is_clear(self, clear_func=None):
         if clear_func:
@@ -87,6 +100,7 @@ class PutSlot:
                 raise Exception
 
     def assign(self, order, alloc_lines):
-        self.order = order
-        self.alloc_lines = alloc_lines
-        self.active = True
+        if order and alloc_lines:
+            self.order = order
+            self.alloc_lines = alloc_lines
+            self.active = True
