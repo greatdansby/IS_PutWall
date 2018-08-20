@@ -1,3 +1,6 @@
+from cartons.cartons import Carton
+from totes.totes import Tote
+
 class PutWall:
     def __init__(self, num_slots, id, queue_length=1, facings=1):
         self.num_slots = num_slots
@@ -15,21 +18,41 @@ class PutWall:
         print('Warning: No tote provided')
         return False
 
-    def fill_from_queue(self, num_totes):
+    def fill_from_queue(self, num_obj):
         log = []
-        for tote in self.queue[:num_totes]:
-            for sku in tote.get_contents():
-                for slot in self.find_slots(sku=sku):
-                    qty_allocated = slot.get_allocation(sku=sku)
-                    qty_remaining = tote.get_qty(sku=sku)
+        for obj in self.queue[:num_obj]:
+            if type(obj) == Tote:
+                tote = obj
+                for sku in tote.get_contents():
+                    for slot in self.find_slots(sku=sku):
+                        qty_allocated = slot.get_allocation(sku=sku)
+                        qty_remaining = tote.get_qty(sku=sku)
+                        qty_available = slot.capacity - slot.quantity
+                        qty_moved = min(qty_allocated, qty_remaining, qty_available)
+                        slot.update_quantity(qty=qty_moved)
+                        slot.update_allocation(sku=sku, qty=-qty_moved)
+                        tote.update_quantity(sku=sku, qty=-qty_moved)
+                        if tote.is_empty():
+                            tote.active = False
+                        tote.allocated = False
+                        log.append('{} of {} moved from tote {} to order {}'.format(qty_moved, sku, tote.id, slot.order))
+            if type(obj) == Carton:
+                carton = obj
+                for slot in self.find_slots(sku=carton.sku):
+                    qty_allocated = slot.get_allocation(sku=carton.sku)
+                    qty_remaining = carton.quantity
                     qty_available = slot.capacity - slot.quantity
                     qty_moved = min(qty_allocated, qty_remaining, qty_available)
                     slot.update_quantity(qty=qty_moved)
-                    slot.update_allocation(sku=sku, qty=-qty_moved)
-                    tote.update_quantity(sku=sku, qty=-qty_moved)
-                    if tote.is_empty():
-                        tote.active = False
-                    log.append('{} of {} moved from tote {} to order {}'.format(qty_moved, sku, tote.id, slot.order))
+                    slot.update_allocation(sku=carton.sku, qty=-qty_moved)
+                    carton.quantity -= qty_moved
+                    if carton.quantity == 0:
+                        carton.active = False
+                    carton.allocated = False
+                    log.append('{} of {} moved from carton {} to order {}'.format(qty_moved,
+                                                                                  carton.sku,
+                                                                                  carton.id,
+                                                                                  slot.order))
         return log
 
     def clear_empty_slots(self):

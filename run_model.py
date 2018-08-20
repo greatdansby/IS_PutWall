@@ -15,10 +15,8 @@ ItemMaster_table = 'dbo.tblItemMaster'
 
 
 def print_timer(start, label=''):
-    time_ttl = round(time.time()-start, 2)
-    label_len = len(label)
-    buffer = '-'*max(30-label_len, 0)
-    print('{0}{1} Elapsed Time {2} seconds'.format(label, buffer, time_ttl))
+    buffer = '-'*max(30-len(label), 0)
+    print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
     return time.time()
 
 
@@ -98,7 +96,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     for sku in active_skus:
         item_master[sku].active = False
 
-    start = print_timer(start, 'Initialized Item Master')
+    start = print_timer(start, 'Initialized item master')
 
     ## Intialize inventory
     cartons = {}
@@ -153,11 +151,13 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             carton = assign_carton(pw=pw, orders=orders, cartons=cartons)
             if carton:
                 pw.add_to_queue(carton)
+                carton.allocated = True
+                start = print_timer(start, 'Tote assignment')
                 print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
 
             # Release more SKUs
-            active_units = sum([c.quantity for c in cartons if c.active == True])
+            active_units = sum([c.quantity for c in cartons.values() if c.active == True])
             if active_units < 50000:
                 inactive_skus = [k for k, v in item_master.items() if v.active == False]
                 activate_skus = np.random.choice(inactive_skus, size=100)

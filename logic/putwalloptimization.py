@@ -42,9 +42,7 @@ def assign_carton(**kwargs):
     order_array = pd.DataFrame([[l.sku, l.quantity] for o in kwargs['orders'].values() for l in o.lines
                               if l.sku in pw_demand])
     sku_demand = order_array.groupby(0).sum()
-    sku_demand = {sku: qty for sku, qty in zip(order_array.index, sku_demand)}
-
-    ordered_cartons = sorted(totes_not_in_queue, key=lambda k: sku_demand[k.sku])
+    ordered_cartons = sorted(totes_not_in_queue, key=lambda k: sku_demand.loc[k.sku, 1])
 
     for carton in ordered_cartons:
         if pw_demand[carton.sku]/carton.quantity >= 1:
