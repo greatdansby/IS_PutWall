@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 
 def assign_store(**kwargs):
     '''
@@ -39,9 +39,10 @@ def assign_carton(**kwargs):
                               carton.active and
                               carton.sku in pw_demand)]
 
-    order_array = np.asarray([[l.sku, l.qty] for o in kwargs['orders'].values() for l in o.lines if l.sku in pw_demand])
-    sku_demand = np.sum(order_array, axis=1)
-    sku_demand = {sku: qty for sku, qty in zip(order_array[0], sku_demand)}
+    order_array = pd.DataFrame([[l.sku, l.quantity] for o in kwargs['orders'].values() for l in o.lines
+                              if l.sku in pw_demand])
+    sku_demand = order_array.groupby(0).sum()
+    sku_demand = {sku: qty for sku, qty in zip(order_array.index, sku_demand)}
 
     ordered_cartons = sorted(totes_not_in_queue, key=lambda k: sku_demand[k.sku])
 
@@ -93,6 +94,7 @@ def get_store_affinity(pw, orders):
     stores_in_pw = [s.order for s in pw.slots.values()]
     stores_avail_for_alloc = [order.id for order in orders.values() if order.allocated == False]
     skus_alloc_to_pw = set([l.sku for o in orders.values() for l in o.lines if o.id in stores_in_pw])
+    ##TODO Fix with matrix
     top_stores = sorted([{'store': order.id, 'qty': sum([l.quantity for o in orders.values() for l in o.lines
                                                       if l.sku in skus_alloc_to_pw])}
                              for order in orders if order in stores_avail_for_alloc], key=lambda k: -k['qty'])

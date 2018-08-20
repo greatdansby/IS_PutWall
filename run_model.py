@@ -119,10 +119,10 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
 
     start = print_timer(start, 'Initialized Totes')
 
-    count_tote_pulls = 0
+    count_carton_pulls = 0
 
     for i in range(100):
-        print('Loop: {}\nTote Pulls: {}'.format(i, count_tote_pulls))
+        print('Loop: {}\nCarton Pulls: {}'.format(i, count_carton_pulls))
 
         for pw in put_walls.values():
             pw.fill_from_queue(1)
@@ -144,10 +144,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 store, lines = assign_store(pw=pw,
                                             orders=orders,
                                             cartons=cartons)
-
                 if store is None:
                     break
-
                 slot.assign(order=store, alloc_lines=lines)
                 orders[store].allocated = True
                 print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
@@ -156,13 +154,22 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             if carton:
                 pw.add_to_queue(carton)
                 print('Carton added to queue for Put-Wall {}'.format(pw.id))
-                count_tote_pulls += 1
+                count_carton_pulls += 1
 
-            ##TODO add sku release
-    count_tote_returns = count_tote_pulls = len([t for t in cartons.values() if t.active == False])
-    print('Carton Pulls: {}'.format(count_tote_pulls))
-    print('Carton Returns: {}'.format(count_tote_returns))
-    print('Carton Tote Moves: {}'.format(count_tote_pulls+count_tote_returns))
+            # Release more SKUs
+            active_units = sum([c.quantity for c in cartons if c.active == True])
+            if active_units < 50000:
+                inactive_skus = [k for k, v in item_master.items() if v.active == False]
+                activate_skus = np.random.choice(inactive_skus, size=100)
+                for sku in active_skus:
+                    item_master[sku].active = True
+                for carton in cartons:
+                    carton.active = item_master[carton.sku].active
+
+    count_carton_returns = count_tote_pulls = len([t for t in cartons.values() if t.active == False])
+    print('Carton Pulls: {}'.format(count_carton_pulls))
+    print('Carton Returns: {}'.format(count_carton_returns))
+    print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))
 
 if __name__ == '__main__':
     run_model()
