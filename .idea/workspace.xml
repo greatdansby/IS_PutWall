@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d119f53-98c0-482a-8303-34259e0376ae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logic/putwalloptimization.py" beforeDir="false" afterPath="$PROJECT_DIR$/logic/putwalloptimization.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/putwall/putwall.py" beforeDir="false" afterPath="$PROJECT_DIR$/putwall/putwall.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_model.py" afterDir="false" />
@@ -23,23 +22,23 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="30" />
+          <entry key="py" value="31" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="30" />
+          <entry key="Python" value="31" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="17" />
-          <entry key="py" value="17699" />
+          <entry key="py" value="18299" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="17716" />
+          <entry key="Python" value="18316" />
         </counts>
       </usages-collector>
     </session>
@@ -49,13 +48,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="756">
-              <caret line="59" selection-start-line="59" selection-end-line="59" />
+            <state relative-caret-position="609">
+              <caret line="81" column="56" lean-forward="true" selection-start-line="81" selection-start-column="56" selection-end-line="81" selection-end-column="56" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
-                <marker date="1534863475052" expanded="true" signature="79:84" ph="..." />
-                <marker date="1534863475052" expanded="true" signature="376:385" ph="..." />
-                <marker date="1534863475052" expanded="true" signature="3550:3555" ph="..." />
+                <marker date="1534880374252" expanded="true" signature="79:84" ph="..." />
+                <marker date="1534880374252" expanded="true" signature="376:385" ph="..." />
+                <marker date="1534880374252" expanded="true" signature="3630:3635" ph="..." />
               </folding>
             </state>
           </provider>
@@ -88,11 +87,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="363">
-              <caret line="86" lean-forward="true" selection-start-line="86" selection-end-line="86" />
+            <state relative-caret-position="384">
+              <caret line="42" column="16" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="16" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -100,15 +99,25 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="141" selection-start-line="141" selection-end-line="141" />
+            <state relative-caret-position="681">
+              <caret line="147" column="70" lean-forward="true" selection-start-line="147" selection-start-column="70" selection-end-line="147" selection-end-column="70" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
-                <marker date="1534866099700" expanded="true" signature="888:889" ph="..." />
-                <marker date="1534866099700" expanded="true" signature="888:912" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="21">
+              <caret line="1" column="81" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="81" />
+              <folding>
+                <marker date="1534797485791" expanded="true" signature="13:245" ph="..." />
               </folding>
             </state>
           </provider>
@@ -122,6 +131,12 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>print_timer(</find>
+      <find>order_dat</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -145,9 +160,9 @@
         <option value="$PROJECT_DIR$/totes/totes.py" />
         <option value="$PROJECT_DIR$/cartons/__init__.py" />
         <option value="$PROJECT_DIR$/cartons/cartons.py" />
-        <option value="$PROJECT_DIR$/putwall/putwall.py" />
         <option value="$PROJECT_DIR$/run_model.py" />
         <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
+        <option value="$PROJECT_DIR$/putwall/putwall.py" />
       </list>
     </option>
   </component>
@@ -340,13 +355,23 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/run_model.py</url>
-          <line>126</line>
-          <option name="timeStamp" value="57" />
+          <line>178</line>
+          <option name="timeStamp" value="68" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/logic/putwalloptimization.py</url>
-          <line>100</line>
-          <option name="timeStamp" value="59" />
+          <url>file://$PROJECT_DIR$/run_model.py</url>
+          <line>144</line>
+          <option name="timeStamp" value="79" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/run_model.py</url>
+          <line>38</line>
+          <option name="timeStamp" value="80" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/putwall/putwall.py</url>
+          <line>60</line>
+          <option name="timeStamp" value="83" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -357,51 +382,59 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="sum([l.quantity for o in orders.values() for l in o.lines])" language="Python" />
+        <watch expression="kwargs['pw'].id" language="Python" />
+        <watch expression="self.get_allocation()" language="Python" />
+        <watch expression="self.find_slots(sku=carton.sku)" language="Python" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
       <expression>
-        <expression-string>list(order_demand.sort_values('1', ascending=False).index)</expression-string>
+        <expression-string>self.get_allocation()</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(order_demand.sort_values(1, ascending=False).index)</expression-string>
+        <expression-string>self.find_slots(sku=carton.sku)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(order_demand.sort_values('units', ascending=False).index)</expression-string>
+        <expression-string>slot.get_allocation(sku=carton.sku)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>order_data[order_data['sku'].isin(list(skus_alloc_to_pw))]</expression-string>
+        <expression-string>sorted([(carton, pw_demand[carton.sku]) for carton in cartons_not_in_queue], key=lambda k: -k[1])[0][0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>order_data[order_data['store'].isin(stores_avail_for_alloc), order_data['sku'].isin(list(skus_alloc_to_pw))]</expression-string>
+        <expression-string>kwargs['pw'].id</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>order_data[order_data['store'].isin(stores_avail_for_alloc), order_data['sku'].isin(skus_alloc_to_pw)]</expression-string>
+        <expression-string>pw.id</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>order_data[order_data['store'].isin(stores_avail_for_alloc)]</expression-string>
+        <expression-string>(order_data.groupby(['store', 'sku'])['units'].sum()).reset_index().set_index(['store','sku'])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>order_data[order_data['Store'].isin(stores_avail_for_alloc)]</expression-string>
+        <expression-string>(order_data.groupby(['store', 'sku'])['units'].sum()).reset_index()</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>order_data[stores_avail_for_alloc, skus_alloc_to_pw]</expression-string>
+        <expression-string>(order_data.groupby(['store', 'sku'])['units'].sum()).set_index(['store','sku'])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -490,12 +523,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/totes/totes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="14" column="108" selection-start-line="14" selection-start-column="108" selection-end-line="14" selection-end-column="108" />
+          <folding>
+            <marker date="1534792118422" expanded="true" signature="11:16" ph="..." />
+            <marker date="1534792118422" expanded="true" signature="1279:1379" ph="..." />
+            <marker date="1534792118422" expanded="true" signature="1553:1558" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="21">
           <caret line="1" column="81" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="81" />
           <folding>
             <marker date="1534797485791" expanded="true" signature="13:245" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="42" column="16" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -511,49 +566,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/totes/totes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="14" column="108" selection-start-line="14" selection-start-column="108" selection-end-line="14" selection-end-column="108" />
-          <folding>
-            <marker date="1534792118422" expanded="true" signature="11:16" ph="..." />
-            <marker date="1534792118422" expanded="true" signature="1279:1379" ph="..." />
-            <marker date="1534792118422" expanded="true" signature="1553:1558" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="756">
-          <caret line="59" selection-start-line="59" selection-end-line="59" />
+        <state relative-caret-position="609">
+          <caret line="81" column="56" lean-forward="true" selection-start-line="81" selection-start-column="56" selection-end-line="81" selection-end-column="56" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
-            <marker date="1534863475052" expanded="true" signature="79:84" ph="..." />
-            <marker date="1534863475052" expanded="true" signature="376:385" ph="..." />
-            <marker date="1534863475052" expanded="true" signature="3550:3555" ph="..." />
+            <marker date="1534880374252" expanded="true" signature="79:84" ph="..." />
+            <marker date="1534880374252" expanded="true" signature="376:385" ph="..." />
+            <marker date="1534880374252" expanded="true" signature="3630:3635" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="141" selection-start-line="141" selection-end-line="141" />
+        <state relative-caret-position="681">
+          <caret line="147" column="70" lean-forward="true" selection-start-line="147" selection-start-column="70" selection-end-line="147" selection-end-column="70" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
-            <marker date="1534866099700" expanded="true" signature="888:889" ph="..." />
-            <marker date="1534866099700" expanded="true" signature="888:912" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="363">
-          <caret line="86" lean-forward="true" selection-start-line="86" selection-end-line="86" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

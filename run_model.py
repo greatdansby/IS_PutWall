@@ -14,14 +14,16 @@ receiving_table = 'tblReceiving'
 ItemMaster_table = 'dbo.tblItemMaster'
 
 
-def print_timer(start, label=''):
+def print_timer(debug, start, label=''):
     buffer = '-'*max(30-len(label), 0)
-    print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
+    if debug:
+        print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
     return time.time()
 
 
 def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_table='dbo.Burlington0501to0511',
               date='5/11/2017'):
+    debug = False
     start = time.time()
 
     ## Initialize orders
@@ -42,7 +44,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
         orders[line['store']].add_line(Line(sku=line['sku'], quantity=line['units']))
     print('{} Open Lines Initialized'.format(sum([o.line_status() for o in orders.values()])))
 
-    start = print_timer(start, 'Initialized orders')
+    start = print_timer(debug, start, 'Initialized orders')
 
     ## Initialize all put walls
 
@@ -62,7 +64,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             else:
                 put_walls[pw].add_slot(PutSlot(id=ps, capacity=np.random.randint(25, 35)))
 
-    start = print_timer(start, 'Initialized put-walls')
+    start = print_timer(debug, start, 'Initialized put-walls')
 
     ## Initialize item_master
     item_master = {}
@@ -100,7 +102,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     for sku in active_skus:
         item_master[sku].active = False
 
-    start = print_timer(start, 'Initialized item master')
+    start = print_timer(debug, start, 'Initialized item master')
 
     ## Intialize inventory
     cartons = {}
@@ -121,22 +123,25 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             carton_id += 1
     print('{} Cartons created.'.format(len(cartons)))
 
-    start = print_timer(start, 'Initialized Totes')
+    start = print_timer(debug, start, 'Initialized Totes')
 
     count_carton_pulls = 0
+    units_shipped = 0
     loop = 0
     while len(orders) > 0:
         print('Loop: {}\nCarton Pulls: {}'.format(loop, count_carton_pulls))
         print('Open Orders: {}'.format(len([o for o in orders.values() if sum([l.quantity for l in o.lines]) > 0])))
         print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
-        start = print_timer(start, 'Loop complete')
+        start = print_timer(debug, start, 'Loop Start')
         loop += 1
         for pw in put_walls.values():
-            print(pw.fill_from_queue(1))
+            log = pw.fill_from_queue(1)
+            if debug: print(log)
+            start = print_timer(debug, start, 'Fill from Q')
             empty_slots = []
             for slot in pw.slots.values():
                 if slot.is_clear():
-                    print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
+                    if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
                     if slot.order in orders:
                         orders[slot.order].lines = slot.alloc_lines
                         order_data.update([{'store': slot.order, 'sku': l.sku, 'units': l.quantity}
@@ -148,7 +153,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                     slot.clear()
                     slot.capacity = np.random.randint(25, 35)
                     empty_slots.append(slot)
-
+            start = print_timer(debug, start, 'Empty Slots')
             for slot in empty_slots:
                 store, lines = assign_store(pw=pw,
                                             orders=orders,
@@ -158,15 +163,15 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                     break
                 slot.assign(order=store, alloc_lines=lines)
                 orders[store].allocated = True
-                print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
-
+                if debug: print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
+            start = print_timer(debug, start, 'Store allocation')
             carton = assign_carton(pw=pw, orders=orders, cartons=cartons)
             if carton:
                 pw.add_to_queue(carton)
                 carton.allocated = True
-                #start = print_timer(start, 'Tote assignment')
-                #print('Carton added to queue for Put-Wall {}'.format(pw.id))
+                if debug: print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
+            start = print_timer(debug, start, 'Carton allocation')
 
             # Release more SKUs
             active_units = sum([c.quantity for c in cartons.values() if c.active == True])
@@ -179,7 +184,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 for carton in cartons:
                     carton.active = item_master[carton.sku].active
 
-    count_carton_returns = count_tote_pulls = len([t for t in cartons.values() if t.active == False])
+    count_carton_returns = count_carton_pulls - len([t for t in cartons.values() if t.active == False])
     print('Carton Pulls: {}'.format(count_carton_pulls))
     print('Carton Returns: {}'.format(count_carton_returns))
     print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))

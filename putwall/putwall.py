@@ -19,6 +19,7 @@ class PutWall:
         return False
 
     def fill_from_queue(self, num_obj):
+        debug = False
         log = []
         for n in range(min(num_obj, len(self.queue))):
             obj = self.queue.pop(0)
@@ -45,7 +46,7 @@ class PutWall:
                     qty_available = slot.capacity - slot.quantity
                     qty_moved = min(qty_allocated, qty_remaining, qty_available)
                     if qty_moved == 0:
-                        print('zero')
+                        if debug: print('No fulfillment due to empty Carton')
                     slot.update_quantity(qty=qty_moved)
                     slot.update_allocation(sku=carton.sku, qty=-qty_moved)
                     carton.quantity -= qty_moved
@@ -77,7 +78,7 @@ class PutWall:
             for line in slot.alloc_lines:
                 if line.sku in allocation:
                     allocation[line.sku] += line.quantity
-                else:
+                elif line.quantity > 0:
                     allocation[line.sku] = line.quantity
         return allocation
 

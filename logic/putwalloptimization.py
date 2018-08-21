@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 import time
 
-def print_timer(start, label=''):
+def print_timer(debug, start, label=''):
     buffer = '-'*max(30-len(label), 0)
-    print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
+    if debug:
+        print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
     return time.time()
 
 def assign_store(**kwargs):
@@ -43,9 +44,8 @@ def assign_carton(**kwargs):
     cartons_not_in_queue = [carton for carton in kwargs['cartons'].values()
                           if (carton not in kwargs['pw'].queue and
                               carton.active and
-                              carton.sku in pw_demand and
-                              carton.allocated == False)]
-
+                              carton.allocated == False and
+                              carton.sku in pw_demand)]
     for carton in cartons_not_in_queue:
         if pw_demand[carton.sku]/carton.quantity >= 1:
             return carton
@@ -89,15 +89,22 @@ def get_store_affinity(pw, orders, order_data):
     :param orders: Dictionary of all orders
     :return: List of stores in order of recommendation
     '''
-
+    debug = False
+    start = time.time()
     stores_in_pw = [s.order for s in pw.slots.values()]
+    start = print_timer(debug, start, 'Store in PW')
     stores_avail_for_alloc = [order.id for order in orders.values() if order.allocated == False]
-    skus_alloc_to_pw = list(set([l.sku for o in orders.values() for l in o.lines
-                            if o.id in stores_in_pw and l.quantity > 0]))
+    start = print_timer(debug, start, 'Store avail')
+    skus_alloc_to_pw = list(pw.get_allocation().keys())
+    start = print_timer(debug, start, 'SKU alloc')
     mask = order_data[['store', 'sku']].isin({'store': stores_avail_for_alloc,
                                              'sku': skus_alloc_to_pw}).all(axis=1)
+    start = print_timer(debug, start, 'Mask')
     order_array = order_data[mask]
+    start = print_timer(debug, start, 'Masking')
     order_demand = order_array.groupby('store').sum()
+    start = print_timer(debug, start, 'Order demand')
     top_stores = list(order_demand.sort_values('units', ascending=False).index)
+    start = print_timer(debug, start, 'Store sort')
 
     return top_stores
