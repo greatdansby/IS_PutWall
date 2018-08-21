@@ -97,10 +97,10 @@ def get_store_affinity(pw, orders, order_data):
     start = print_timer(debug, start, 'Store avail')
     skus_alloc_to_pw = list(pw.get_allocation().keys())
     start = print_timer(debug, start, 'SKU alloc')
-    mask = order_data[['store', 'sku']].isin({'store': stores_avail_for_alloc,
-                                             'sku': skus_alloc_to_pw}).all(axis=1)
+    skus = order_data.index.get_level_values('sku').isin(skus_alloc_to_pw)
+    stores = order_data.index.get_level_values('store').isin(stores_avail_for_alloc)
     start = print_timer(debug, start, 'Mask')
-    order_array = order_data[mask]
+    order_array = order_data[skus & stores]
     start = print_timer(debug, start, 'Masking')
     order_demand = order_array.groupby('store').sum()
     start = print_timer(debug, start, 'Order demand')

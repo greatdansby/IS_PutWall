@@ -42,6 +42,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             print('Added store order: {}'.format(line['store']))
             orders[line['store']] = Order(id=line['store'])
         orders[line['store']].add_line(Line(sku=line['sku'], quantity=line['units']))
+    order_data = order_data.set_index(['store','sku'])
     print('{} Open Lines Initialized'.format(sum([o.line_status() for o in orders.values()])))
 
     start = print_timer(debug, start, 'Initialized orders')
@@ -132,27 +133,26 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
         print('Loop: {}\nCarton Pulls: {}'.format(loop, count_carton_pulls))
         print('Open Orders: {}'.format(len([o for o in orders.values() if sum([l.quantity for l in o.lines]) > 0])))
         print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
-        start = print_timer(debug, start, 'Loop Start')
+        print('Active Units: {}'.format(sum([c.quantity for c in cartons.values() if c.active == True])))
+        start = print_timer(True, start, 'Loop Start')
         loop += 1
         for pw in put_walls.values():
             log = pw.fill_from_queue(1)
             if debug: print(log)
             start = print_timer(debug, start, 'Fill from Q')
             empty_slots = []
-            for slot in pw.slots.values():
-                if slot.is_clear():
-                    if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
-                    if slot.order in orders:
-                        orders[slot.order].lines = slot.alloc_lines
-                        order_data.update([{'store': slot.order, 'sku': l.sku, 'units': l.quantity}
-                                           for l in slot.alloc_lines])
-                        if sum([l.quantity for l in orders[slot.order].lines]) == 0:
-                            del orders[slot.order]
-                            print('Order closed: {}'.format(slot.order))
-                        orders[slot.order].allocated = False
-                    slot.clear()
-                    slot.capacity = np.random.randint(25, 35)
-                    empty_slots.append(slot)
+            for slot in [s for s in pw.slots.values() if s.is_clear()]:
+                if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
+                orders[slot.order].lines = slot.alloc_lines
+                order_data.update(pd.DataFrame([{'store': slot.order, 'sku': l.sku, 'units': l.quantity}
+                                   for l in slot.alloc_lines]).set_index(['store', 'sku']))
+                if sum([l.quantity for l in orders[slot.order].lines]) == 0:
+                    del orders[slot.order]
+                    print('Order closed: {}'.format(slot.order))
+                orders[slot.order].allocated = False
+                slot.clear()
+                slot.capacity = np.random.randint(25, 35)
+                empty_slots.append(slot)
             start = print_timer(debug, start, 'Empty Slots')
             for slot in empty_slots:
                 store, lines = assign_store(pw=pw,
