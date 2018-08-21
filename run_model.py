@@ -126,7 +126,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     count_carton_pulls = 0
     loop = 0
     while len(orders) > 0:
-        print('Loop: {}\nCarton Pulls: {}\nOpen Orders: {}'.format(loop, count_carton_pulls, len(orders)))
+        print('Loop: {}\nCarton Pulls: {}'.format(loop, count_carton_pulls))
+        print('Open Orders: {}'.format(len([o for o in orders.values() if sum([l.quantity for l in o.lines]) > 0])))
         print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
         start = print_timer(start, 'Loop complete')
         loop += 1
@@ -138,6 +139,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                     print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
                     if slot.order in orders:
                         orders[slot.order].lines = slot.alloc_lines
+                        order_data.update([{'store': slot.order, 'sku': l.sku, 'units': l.quantity}
+                                           for l in slot.alloc_lines])
                         if sum([l.quantity for l in orders[slot.order].lines]) == 0:
                             del orders[slot.order]
                             print('Order closed: {}'.format(slot.order))
@@ -149,6 +152,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             for slot in empty_slots:
                 store, lines = assign_store(pw=pw,
                                             orders=orders,
+                                            order_data=order_data,
                                             cartons=cartons)
                 if store is None:
                     break

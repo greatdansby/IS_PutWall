@@ -22,7 +22,7 @@ def assign_store(**kwargs):
     '''
 
     # Get a list of stores with the best affinity to the current put-wall
-    top_stores = get_store_affinity(kwargs['pw'], kwargs['orders'])
+    top_stores = get_store_affinity(kwargs['pw'], kwargs['orders'], kwargs['order_data'])
 
     if top_stores:
         return top_stores[0], kwargs['orders'][top_stores[0]].lines
@@ -50,7 +50,7 @@ def assign_carton(**kwargs):
         if pw_demand[carton.sku]/carton.quantity >= 1:
             return carton
     if cartons_not_in_queue:
-        return np.random.choice(cartons_not_in_queue)
+        return sorted([(carton, pw_demand[carton.sku]) for carton in cartons_not_in_queue], key=lambda k: -k[1])[0][0]
     return None
 
 
@@ -76,7 +76,7 @@ def get_top_stores(orders, sort='Lines', num=999999):
     return None
 
 
-def get_store_affinity(pw, orders):
+def get_store_affinity(pw, orders, order_data):
     '''
 
     Find all stores active in the current put-wall
@@ -92,10 +92,12 @@ def get_store_affinity(pw, orders):
 
     stores_in_pw = [s.order for s in pw.slots.values()]
     stores_avail_for_alloc = [order.id for order in orders.values() if order.allocated == False]
-    skus_alloc_to_pw = set([l.sku for o in orders.values() for l in o.lines if o.id in stores_in_pw])
-    order_array = pd.DataFrame([[o.id, l.quantity] for o in orders.values() for l in o.lines
-                                if l.sku in skus_alloc_to_pw and o.id in stores_avail_for_alloc])
-    order_demand = order_array.groupby(0).sum()
-    top_stores = list(order_demand.sort_values(1, ascending=False).index)
+    skus_alloc_to_pw = list(set([l.sku for o in orders.values() for l in o.lines
+                            if o.id in stores_in_pw and l.quantity > 0]))
+    mask = order_data[['store', 'sku']].isin({'store': stores_avail_for_alloc,
+                                             'sku': skus_alloc_to_pw}).all(axis=1)
+    order_array = order_data[mask]
+    order_demand = order_array.groupby('store').sum()
+    top_stores = list(order_demand.sort_values('units', ascending=False).index)
 
     return top_stores

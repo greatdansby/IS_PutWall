@@ -56,6 +56,8 @@ class PutWall:
                                                                                   carton.sku,
                                                                                   carton.id,
                                                                                   slot.order))
+        if log == []:
+            print('No fulfillment')
         return log
 
     def clear_empty_slots(self):
