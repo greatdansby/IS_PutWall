@@ -1,5 +1,11 @@
 import numpy as np
 import pandas as pd
+import time
+
+def print_timer(start, label=''):
+    buffer = '-'*max(30-len(label), 0)
+    print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
+    return time.time()
 
 def assign_store(**kwargs):
     '''
@@ -19,7 +25,7 @@ def assign_store(**kwargs):
     top_stores = get_store_affinity(kwargs['pw'], kwargs['orders'])
 
     if top_stores:
-        return top_stores[0]['store'], kwargs['orders'][top_stores[0]['store']].lines
+        return top_stores[0], kwargs['orders'][top_stores[0]].lines
 
     return None, None
 
@@ -32,24 +38,19 @@ def assign_carton(**kwargs):
     :param kwargs:
     :return:
     '''
-    pw_demand = kwargs['pw'].get_allocation()
 
-    totes_not_in_queue = [carton for carton in kwargs['cartons'].values()
+    pw_demand = kwargs['pw'].get_allocation()
+    cartons_not_in_queue = [carton for carton in kwargs['cartons'].values()
                           if (carton not in kwargs['pw'].queue and
                               carton.active and
-                              carton.sku in pw_demand)]
+                              carton.sku in pw_demand and
+                              carton.allocated == False)]
 
-    order_array = pd.DataFrame([[l.sku, l.quantity] for o in kwargs['orders'].values() for l in o.lines
-                              if l.sku in pw_demand])
-    sku_demand = order_array.groupby(0).sum()
-    ordered_cartons = sorted(totes_not_in_queue, key=lambda k: sku_demand.loc[k.sku, 1])
-
-    for carton in ordered_cartons:
+    for carton in cartons_not_in_queue:
         if pw_demand[carton.sku]/carton.quantity >= 1:
             return carton
-    if totes_not_in_queue:
-        return np.random.choice(totes_not_in_queue)
-
+    if cartons_not_in_queue:
+        return np.random.choice(cartons_not_in_queue)
     return None
 
 
@@ -92,8 +93,9 @@ def get_store_affinity(pw, orders):
     stores_in_pw = [s.order for s in pw.slots.values()]
     stores_avail_for_alloc = [order.id for order in orders.values() if order.allocated == False]
     skus_alloc_to_pw = set([l.sku for o in orders.values() for l in o.lines if o.id in stores_in_pw])
-    ##TODO Fix with matrix
-    top_stores = sorted([{'store': order.id, 'qty': sum([l.quantity for o in orders.values() for l in o.lines
-                                                      if l.sku in skus_alloc_to_pw])}
-                             for order in orders if order in stores_avail_for_alloc], key=lambda k: -k['qty'])
+    order_array = pd.DataFrame([[o.id, l.quantity] for o in orders.values() for l in o.lines
+                                if l.sku in skus_alloc_to_pw and o.id in stores_avail_for_alloc])
+    order_demand = order_array.groupby(0).sum()
+    top_stores = list(order_demand.sort_values(1, ascending=False).index)
+
     return top_stores

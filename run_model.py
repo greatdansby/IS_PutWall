@@ -90,7 +90,11 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     item_master_data = pd.read_sql_query(sql_query, engine)
     item_master_data.set_index('sku', inplace=True)
     item_master = {i: SKU(id=i) for i in item_master_data.index}
-    sku_list = list(item_master.keys())
+
+    # Order sku_list by demand ascending
+    order_array = pd.DataFrame([[l.sku, l.quantity] for o in orders.values() for l in o.lines])
+    sku_demand = order_array.groupby(0).sum()
+    sku_list = sku_demand.index
     np.random.seed(32)
     active_skus = np.random.choice(sku_list, size=int(len(sku_list)*.6))
     for sku in active_skus:
@@ -110,6 +114,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     for sku in sku_list:
         while units.loc[sku, 'Units'] > 0:
             units_per_case = units.loc[sku, 'unitspercase']
+            if units_per_case == 0:
+                units_per_case = units.loc[sku, 'Units']
             cartons[carton_id] = Carton(carton_id, active=item_master[sku].active, sku=sku, quantity=units_per_case)
             units.loc[sku, 'Units'] -= min(units_per_case, units.loc[sku, 'Units'])
             carton_id += 1
@@ -118,13 +124,14 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     start = print_timer(start, 'Initialized Totes')
 
     count_carton_pulls = 0
-
-    for i in range(100):
-        print('Loop: {}\nCarton Pulls: {}'.format(i, count_carton_pulls))
-
+    loop = 0
+    while len(orders) > 0:
+        print('Loop: {}\nCarton Pulls: {}\nOpen Orders: {}'.format(loop, count_carton_pulls, len(orders)))
+        print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
+        start = print_timer(start, 'Loop complete')
+        loop += 1
         for pw in put_walls.values():
-            pw.fill_from_queue(1)
-
+            print(pw.fill_from_queue(1))
             empty_slots = []
             for slot in pw.slots.values():
                 if slot.is_clear():
@@ -136,6 +143,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                             print('Order closed: {}'.format(slot.order))
                         orders[slot.order].allocated = False
                     slot.clear()
+                    slot.capacity = np.random.randint(25, 35)
                     empty_slots.append(slot)
 
             for slot in empty_slots:
@@ -152,13 +160,14 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             if carton:
                 pw.add_to_queue(carton)
                 carton.allocated = True
-                start = print_timer(start, 'Tote assignment')
-                print('Carton added to queue for Put-Wall {}'.format(pw.id))
+                #start = print_timer(start, 'Tote assignment')
+                #print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
 
             # Release more SKUs
             active_units = sum([c.quantity for c in cartons.values() if c.active == True])
             if active_units < 50000:
+                print('Releasing more SKUs...')
                 inactive_skus = [k for k, v in item_master.items() if v.active == False]
                 activate_skus = np.random.choice(inactive_skus, size=100)
                 for sku in active_skus:

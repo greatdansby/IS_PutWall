@@ -20,7 +20,8 @@ class PutWall:
 
     def fill_from_queue(self, num_obj):
         log = []
-        for obj in self.queue[:num_obj]:
+        for n in range(min(num_obj, len(self.queue))):
+            obj = self.queue.pop(0)
             if type(obj) == Tote:
                 tote = obj
                 for sku in tote.get_contents():
@@ -43,6 +44,8 @@ class PutWall:
                     qty_remaining = carton.quantity
                     qty_available = slot.capacity - slot.quantity
                     qty_moved = min(qty_allocated, qty_remaining, qty_available)
+                    if qty_moved == 0:
+                        print('zero')
                     slot.update_quantity(qty=qty_moved)
                     slot.update_allocation(sku=carton.sku, qty=-qty_moved)
                     carton.quantity -= qty_moved
@@ -64,11 +67,7 @@ class PutWall:
         return empty_slots
 
     def find_slots(self, sku=None):
-        found_slots = []
-        for slot in self.slots.values():
-            if slot.get_allocation(sku=sku) > 0:
-                found_slots.append(slot)
-        return found_slots
+        return [slot for slot in self.slots.values() if slot.get_allocation(sku=sku) > 0]
 
     def get_allocation(self):
         allocation = {}
@@ -103,6 +102,7 @@ class PutSlot:
         self.order = None
         self.alloc_lines = None
         self.active = False
+        self.quantity = 0
 
     def get_allocation(self, sku):
         if self.alloc_lines:
