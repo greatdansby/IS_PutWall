@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d119f53-98c0-482a-8303-34259e0376ae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/logic/putwalloptimization.py" beforeDir="false" afterPath="$PROJECT_DIR$/logic/putwalloptimization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/putwall/putwall.py" beforeDir="false" afterPath="$PROJECT_DIR$/putwall/putwall.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_model.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,23 +22,27 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="31" />
+          <entry key="py" value="32" />
+          <entry key="txt" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="31" />
+          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="Python" value="32" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="17" />
-          <entry key="py" value="18299" />
+          <entry key="py" value="18893" />
+          <entry key="txt" value="35" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="18316" />
+          <entry key="PLAIN_TEXT" value="35" />
+          <entry key="Python" value="18910" />
         </counts>
       </usages-collector>
     </session>
@@ -48,8 +52,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="609">
-              <caret line="81" column="56" lean-forward="true" selection-start-line="81" selection-start-column="56" selection-end-line="81" selection-end-column="56" />
+            <state relative-caret-position="653">
+              <caret line="60" selection-start-line="60" selection-end-line="60" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
                 <marker date="1534880374252" expanded="true" signature="79:84" ph="..." />
@@ -90,8 +94,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="384">
-              <caret line="42" column="16" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="16" />
+            <state relative-caret-position="275">
+              <caret line="42" selection-start-line="42" selection-end-line="42" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -99,14 +103,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="681">
-              <caret line="147" column="70" lean-forward="true" selection-start-line="147" selection-start-column="70" selection-end-line="147" selection-end-column="70" />
-              <folding>
-                <element signature="e#0#44#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="105">
+              <caret line="5" selection-start-line="5" selection-end-line="8" selection-end-column="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/requirements.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="21">
+              <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -160,9 +170,10 @@
         <option value="$PROJECT_DIR$/totes/totes.py" />
         <option value="$PROJECT_DIR$/cartons/__init__.py" />
         <option value="$PROJECT_DIR$/cartons/cartons.py" />
-        <option value="$PROJECT_DIR$/run_model.py" />
-        <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
         <option value="$PROJECT_DIR$/putwall/putwall.py" />
+        <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
+        <option value="$PROJECT_DIR$/run_model.py" />
+        <option value="$PROJECT_DIR$/requirements.txt" />
       </list>
     </option>
   </component>
@@ -294,6 +305,14 @@
       <option name="presentableId" value="Default" />
       <updated>1534444021124</updated>
     </task>
+    <task id="LOCAL-00001" summary="Fixed order syncing with order_data">
+      <created>1534886588275</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1534886588275</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TodoView">
@@ -310,10 +329,10 @@
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" weight="0.14754099" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.14754099" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info id="Debug" order="3" weight="0.3722898" />
-      <window_info active="true" id="Run" order="4" visible="true" weight="0.34531993" />
+      <window_info id="Run" order="4" weight="0.34531993" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.3295583" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="2" weight="0.3295583" />
@@ -350,28 +369,22 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fixed order syncing with order_data" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed order syncing with order_data" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/run_model.py</url>
-          <line>178</line>
+          <line>179</line>
           <option name="timeStamp" value="68" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/run_model.py</url>
-          <line>144</line>
-          <option name="timeStamp" value="79" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/run_model.py</url>
-          <line>38</line>
-          <option name="timeStamp" value="80" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/putwall/putwall.py</url>
-          <line>60</line>
-          <option name="timeStamp" value="83" />
+          <line>174</line>
+          <option name="timeStamp" value="97" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -384,57 +397,61 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="sum([l.quantity for o in orders.values() for l in o.lines])" language="Python" />
-        <watch expression="kwargs['pw'].id" language="Python" />
-        <watch expression="self.get_allocation()" language="Python" />
-        <watch expression="self.find_slots(sku=carton.sku)" language="Python" />
+        <watch expression="order_data.index.get_level_values('sku').isin(skus_alloc_to_pw)" language="Python" />
+        <watch expression="[carton for carton in kwargs['cartons'].values()                           if (carton not in kwargs['pw'].queue and                               carton.active and                               carton.allocated == False)]" language="Python" />
+        <watch expression="[carton for carton in kwargs['cartons'].values() if carton.quantity&gt;0 and not carton.active]" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
       <expression>
-        <expression-string>self.get_allocation()</expression-string>
+        <expression-string>[carton for carton in kwargs['cartons'].values() if carton.quantity&gt;0 and not carton.active]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.find_slots(sku=carton.sku)</expression-string>
+        <expression-string>[carton for carton in kwargs['cartons'].values() if carton.quantity&gt;0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>slot.get_allocation(sku=carton.sku)</expression-string>
+        <expression-string>[carton for carton in kwargs['cartons'].values() if carton.sku in pw_demand and carton.quantity&gt;0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>sorted([(carton, pw_demand[carton.sku]) for carton in cartons_not_in_queue], key=lambda k: -k[1])[0][0]</expression-string>
+        <expression-string>[carton for carton in kwargs['cartons'].values() if carton.sku in pw_demand and carton.active]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>kwargs['pw'].id</expression-string>
+        <expression-string>[carton for carton in kwargs['cartons'].values() if carton.sku in pw_demand]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>pw.id</expression-string>
+        <expression-string>[carton for carton in cartons.values() if carton.sku in pw_demand]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>(order_data.groupby(['store', 'sku'])['units'].sum()).reset_index().set_index(['store','sku'])</expression-string>
+        <expression-string>[carton for carton in cartons.values() if carton.sku=='AB71357135']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>(order_data.groupby(['store', 'sku'])['units'].sum()).reset_index()</expression-string>
+        <expression-string>[carton for carton in cartons if carton.sku=='AB71357135']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>(order_data.groupby(['store', 'sku'])['units'].sum()).set_index(['store','sku'])</expression-string>
+        <expression-string>[carton for carton in cartons if carton.sku==''AB71357135']</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>[carton for carton in kwargs['cartons'].values()                           if (carton not in kwargs['pw'].queue and                               carton.active and                               carton.allocated == False)]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -516,13 +533,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="308" selection-start-line="308" selection-end-line="308" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/totes/totes.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="294">
@@ -531,26 +541,6 @@
             <marker date="1534792118422" expanded="true" signature="11:16" ph="..." />
             <marker date="1534792118422" expanded="true" signature="1279:1379" ph="..." />
             <marker date="1534792118422" expanded="true" signature="1553:1558" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="21">
-          <caret line="1" column="81" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="81" />
-          <folding>
-            <marker date="1534797485791" expanded="true" signature="13:245" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="42" column="16" selection-start-line="42" selection-start-column="16" selection-end-line="42" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -566,10 +556,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="308" selection-start-line="308" selection-end-line="308" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="609">
-          <caret line="81" column="56" lean-forward="true" selection-start-line="81" selection-start-column="56" selection-end-line="81" selection-end-column="56" />
+        <state relative-caret-position="653">
+          <caret line="60" selection-start-line="60" selection-end-line="60" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
             <marker date="1534880374252" expanded="true" signature="79:84" ph="..." />
@@ -579,13 +586,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21">
+          <caret line="1" column="81" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="81" />
+          <folding>
+            <marker date="1534797485791" expanded="true" signature="13:245" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/run_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="681">
-          <caret line="147" column="70" lean-forward="true" selection-start-line="147" selection-start-column="70" selection-end-line="147" selection-end-column="70" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="105">
+          <caret line="5" selection-start-line="5" selection-end-line="8" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21">
+          <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
         </state>
       </provider>
     </entry>

@@ -18,12 +18,13 @@ def print_timer(debug, start, label=''):
     buffer = '-'*max(30-len(label), 0)
     if debug:
         print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
-    return time.time()
+        return time.time()
+    return start
 
 
 def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_table='dbo.Burlington0501to0511',
               date='5/11/2017'):
-    debug = False
+    debug = True
     start = time.time()
 
     ## Initialize orders
@@ -175,14 +176,15 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
 
             # Release more SKUs
             active_units = sum([c.quantity for c in cartons.values() if c.active == True])
-            if active_units < 50000:
+            if active_units < 500000:
                 print('Releasing more SKUs...')
                 inactive_skus = [k for k, v in item_master.items() if v.active == False]
-                activate_skus = np.random.choice(inactive_skus, size=100)
-                for sku in active_skus:
-                    item_master[sku].active = True
-                for carton in cartons:
-                    carton.active = item_master[carton.sku].active
+                if inactive_skus:
+                    activate_skus = np.random.choice(inactive_skus, size=100)
+                    for sku in active_skus:
+                        item_master[sku].active = True
+                    for carton in cartons.values():
+                        carton.active = item_master[carton.sku].active
 
     count_carton_returns = count_carton_pulls - len([t for t in cartons.values() if t.active == False])
     print('Carton Pulls: {}'.format(count_carton_pulls))
