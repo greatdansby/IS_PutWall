@@ -9,7 +9,7 @@ import numpy as np
 import time
 
 # create engine for quering using sqlalchemy
-engine = sa.create_engine('mssql+pyodbc://sa:FT123!@#@lab-sqlserver3.invata.com\SQL2014/Burlington?driver=SQL+Server+Native+Client+11.0')
+#engine = sa.create_engine('mssql+pyodbc://sa:FT123!@#@lab-sqlserver3.invata.com\SQL2014/Burlington?driver=SQL+Server+Native+Client+11.0')
 receiving_table = 'tblReceiving'
 ItemMaster_table = 'dbo.tblItemMaster'
 
@@ -26,55 +26,39 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
               date='5/11/2017'):
     debug = True
     start = time.time()
+    df_dict = {'units': {}}
 
     ## Initialize orders
-    orders = {}
-    sql_query = '''select ShipTo as store,
+    sql_query = '''select ShipTo as id,
                     sku,
-                    UnitQty_Future as units,
-                    0 as fulfilled
+                    UnitQty_Future as units
                     From {}
                     Where ShipDate = '{}'
                    Order by ShipTo, SKU'''.format(order_table, date)
-    order_data = pd.read_sql_query(sql_query, engine)
-    order_data = (order_data.groupby(['store', 'sku'])['units'].sum()).reset_index()
-    for line in order_data.to_dict('records'):
-        if line['store'] not in orders:
-            print('Added store order: {}'.format(line['store']))
-            orders[line['store']] = Order(id=line['store'])
-        orders[line['store']].add_line(Line(sku=line['sku'], quantity=line['units']))
-    order_data = order_data.set_index(['store','sku'])
-    print('{} Open Lines Initialized'.format(sum([o.line_status() for o in orders.values()])))
+    #order_data = pd.read_sql_query(sql_query, engine)
+    order_data = pd.DataFrame().from_csv('order_data.csv')
+    order_data = (order_data.groupby(['id', 'sku'])['units'].sum()).reset_index()
+    order_data = order_data.set_index(['id', 'sku'])
+    stores = pd.unique(order_data.index.get_level_values('id'))
+    skus = pd.unique(order_data.index.get_level_values('sku'))
 
-    start = print_timer(debug, start, 'Initialized orders')
+    start = print_timer(debug, start, 'Initialized stores')
 
     ## Initialize all put walls
-
-    put_walls = {}
-    top_stores = get_top_stores(orders, sort='Lines')
-    for pw in range(num_putwalls):
-        put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall)
-        for ps in range(num_slot_per_wall):
-            if top_stores:
-                order_id = top_stores.pop(0)
-                orders[order_id].allocated = True
-                put_walls[pw].add_slot(PutSlot(id=ps,
-                                               capacity=np.random.randint(25, 35),
-                                               order=order_id,
-                                               active=True,
-                                               alloc_lines=orders[order_id].lines))
-            else:
-                put_walls[pw].add_slot(PutSlot(id=ps, capacity=np.random.randint(25, 35)))
+    put_walls = {'PW{}'.format(pw): ['PS{}'.format(ps) for ps in range(num_slot_per_wall)]
+                 for pw in range(num_putwalls)}
+    df_dict['units'].update({('{}-{}'.format(pw, ps), sku): 0 for pw in put_walls
+                             for ps in put_walls[pw]
+                             for sku in skus})
 
     start = print_timer(debug, start, 'Initialized put-walls')
 
     ## Initialize item_master
-    item_master = {}
 
     sql_query = '''select sku,
     		Sum(UnitQty_Future) AS Units,
     		count(sku) AS Lines,
-    		ISNULL(COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase),21) AS unitspercase
+    		COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase, 21) AS unitspercase
     From {} OO
     OUTER APPLY (
     select AVG(RO.UOMQty) AVGUnitsPerCase,
@@ -89,50 +73,33 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     Where ShipDate = '{}'
     group by sku,
     		OA.MaxUnitsPerCase,
+    		
     		OB.MaxUnitsPerCase
     order by lines desc'''.format(order_table, date)
-    item_master_data = pd.read_sql_query(sql_query, engine)
+    #item_master_data = pd.read_sql_query(sql_query, engine)
+    item_master_data = pd.DataFrame().from_csv('item_master.csv')
     item_master_data.set_index('sku', inplace=True)
-    item_master = {i: SKU(id=i) for i in item_master_data.index}
-
-    # Order sku_list by demand ascending
-    order_array = pd.DataFrame([[l.sku, l.quantity] for o in orders.values() for l in o.lines])
-    sku_demand = order_array.groupby(0).sum()
-    sku_list = sku_demand.index
-    np.random.seed(32)
-    active_skus = np.random.choice(sku_list, size=int(len(sku_list)*.6))
-    for sku in active_skus:
-        item_master[sku].active = False
-
+    item_master_data['cases'] = (np.ceil(item_master_data.Units / item_master_data.unitspercase)).astype(int)
     start = print_timer(debug, start, 'Initialized item master')
 
     ## Intialize inventory
-    cartons = {}
-    inventory_table = pd.DataFrame(index=None,
-                             columns=['tote_id', 'sku_id', 'tote_qty', 'inv_qty', 'active', 'loop_activated'],
-                             dtype=int)
-    units = item_master_data
-    ttl_units = np.sum(units.loc[:, 'Units'])
-    carton_id = 0
+    df_dict['units'].update({('{}-{}'.format(sku, i), sku): row.unitspercase
+               for sku, row in item_master_data.iterrows()
+               for i in range(row.cases)})
+    start = print_timer(debug, start, 'Create cartons')
 
-    for sku in sku_list:
-        while units.loc[sku, 'Units'] > 0:
-            units_per_case = units.loc[sku, 'unitspercase']
-            if units_per_case == 0:
-                units_per_case = units.loc[sku, 'Units']
-            cartons[carton_id] = Carton(carton_id, active=item_master[sku].active, sku=sku, quantity=units_per_case)
-            units.loc[sku, 'Units'] -= min(units_per_case, units.loc[sku, 'Units'])
-            carton_id += 1
-    print('{} Cartons created.'.format(len(cartons)))
-
-    start = print_timer(debug, start, 'Initialized Totes')
+    df = pd.DataFrame(df_dict)
+    start = print_timer(debug, start, 'Load DataFrame')
 
     count_carton_pulls = 0
     units_shipped = 0
     loop = 0
-    while len(orders) > 0:
+    while len(stores) > 0:
         print('Loop: {}\nCarton Pulls: {}'.format(loop, count_carton_pulls))
-        print('Open Orders: {}'.format(len([o for o in orders.values() if sum([l.quantity for l in o.lines]) > 0])))
+        start = print_timer(True, start, 'Loop Start')
+        order_totals = df.loc[stores].groupby(level=[0]).sum()
+        start = print_timer(True, start, 'Order totals')
+        print('Open Orders: {}'.format(len(df.loc[stores].sum() < 0)))
         print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
         print('Active Units: {}'.format(sum([c.quantity for c in cartons.values() if c.active == True])))
         start = print_timer(True, start, 'Loop Start')

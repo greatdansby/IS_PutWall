@@ -2,9 +2,10 @@ from cartons.cartons import Carton
 from totes.totes import Tote
 
 class PutWall:
-    def __init__(self, num_slots, id, queue_length=1, facings=1):
+    def __init__(self, df, num_slots, id, queue_length=1, facings=1):
         self.num_slots = num_slots
         self.id = id
+        self.df = df
         self.slots = {}
         self.queue = []
 
