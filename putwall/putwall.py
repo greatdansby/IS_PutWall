@@ -53,10 +53,7 @@ class PutWall:
                     if carton.quantity == 0:
                         carton.active = False
                     carton.allocated = False
-                    log.append('{} of {} moved from carton {} to order {}'.format(qty_moved,
-                                                                                  carton.sku,
-                                                                                  carton.id,
-                                                                                  slot.order))
+                    log.append({'quantity':qty_moved, 'sku':carton.sku, 'carton_id':carton.id, 'order':slot.order})
         if log == []:
             print('No fulfillment')
         return log
@@ -123,6 +120,7 @@ class PutSlot:
         for line in [l for l in self.alloc_lines if l.sku == sku]:
             if line.quantity + qty >= 0:
                 line.quantity += qty
+                line.status = 'Updated'
             else:
                 print('Cannot change allocation to a negative')
                 raise Exception

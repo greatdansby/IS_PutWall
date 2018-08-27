@@ -17,7 +17,7 @@ ItemMaster_table = 'dbo.tblItemMaster'
 def print_timer(debug, start, label=''):
     buffer = '-'*max(30-len(label), 0)
     if debug:
-        print('{}{} Elapsed Time {:.4} seconds'.format(label, buffer, time.time()-start))
+        print('{}{} Elapsed Time {:.5} seconds'.format(label, buffer, time.time()-start))
         return time.time()
     return start
 
@@ -25,19 +25,27 @@ def print_timer(debug, start, label=''):
 def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_table='dbo.Burlington0501to0511',
               date='5/11/2017'):
     debug = True
+    initialize = False
     start = time.time()
 
     ## Initialize orders
     orders = {}
-    sql_query = '''select ShipTo as store,
-                    sku,
-                    UnitQty_Future as units,
-                    0 as fulfilled
-                    From {}
-                    Where ShipDate = '{}'
-                   Order by ShipTo, SKU'''.format(order_table, date)
-    order_data = pd.read_sql_query(sql_query, engine)
-    order_data = (order_data.groupby(['store', 'sku'])['units'].sum()).reset_index()
+    if initialize:
+        data_store = pd.HDFStore('data_20180827.h5')
+
+        sql_query = '''select ShipTo as store,
+                        sku,
+                        UnitQty_Future as units,
+                        0 as fulfilled
+                        From {}
+                        Where ShipDate = '{}'
+                       Order by ShipTo, SKU'''.format(order_table, date)
+        order_data = pd.read_sql_query(sql_query, engine)
+        order_data = (order_data.groupby(['store', 'sku'])['units'].sum()).reset_index()
+        data_store['order_data'] = order_data
+    else:
+        data_store = pd.HDFStore('data_20180827.h5')
+        order_data = data_store['order_data']
     for line in order_data.to_dict('records'):
         if line['store'] not in orders:
             print('Added store order: {}'.format(line['store']))
@@ -70,31 +78,36 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
 
     ## Initialize item_master
     item_master = {}
+    if initialize:
+        sql_query = '''select sku,
+                Sum(UnitQty_Future) AS Units,
+                count(sku) AS Lines,
+                ISNULL(COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase),21) AS unitspercase
+        From {} OO
+        OUTER APPLY (
+        select AVG(RO.UOMQty) AVGUnitsPerCase,
+                MAX(RO.UOMQty) MaxUnitsPerCase
+        from tblReceiving_Old RO
+        where OO.SKU = RO.SKU) OA
+        OUTER APPLY (
+        select AVG(R.UOMQty) AVGUnitsPerCase,
+                MAX(R.UOMQty) MaxUnitsPerCase
+        from tblReceiving R
+        where OO.SKU = R.SKU) OB
+        Where ShipDate = '{}'
+        group by sku,
+                OA.MaxUnitsPerCase,
+                OB.MaxUnitsPerCase
+        order by lines desc'''.format(order_table, date)
+        item_master_data = pd.read_sql_query(sql_query, engine)
+        item_master_data.set_index('sku', inplace=True)
+        data_store['item_master_data'] = item_master_data
+    else:
+        item_master_data = data_store['item_master_data']
 
-    sql_query = '''select sku,
-    		Sum(UnitQty_Future) AS Units,
-    		count(sku) AS Lines,
-    		ISNULL(COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase),21) AS unitspercase
-    From {} OO
-    OUTER APPLY (
-    select AVG(RO.UOMQty) AVGUnitsPerCase,
-    		MAX(RO.UOMQty) MaxUnitsPerCase
-    from tblReceiving_Old RO
-    where OO.SKU = RO.SKU) OA
-    OUTER APPLY (
-    select AVG(R.UOMQty) AVGUnitsPerCase,
-    		MAX(R.UOMQty) MaxUnitsPerCase
-    from tblReceiving R
-    where OO.SKU = R.SKU) OB
-    Where ShipDate = '{}'
-    group by sku,
-    		OA.MaxUnitsPerCase,
-    		OB.MaxUnitsPerCase
-    order by lines desc'''.format(order_table, date)
-    item_master_data = pd.read_sql_query(sql_query, engine)
-    item_master_data.set_index('sku', inplace=True)
+    data_store.close()
+
     item_master = {i: SKU(id=i) for i in item_master_data.index}
-
     # Order sku_list by demand ascending
     order_array = pd.DataFrame([[l.sku, l.quantity] for o in orders.values() for l in o.lines])
     sku_demand = order_array.groupby(0).sum()
@@ -114,15 +127,21 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     units = item_master_data
     ttl_units = np.sum(units.loc[:, 'Units'])
     carton_id = 0
-
+    carton_data = []
     for sku in sku_list:
         while units.loc[sku, 'Units'] > 0:
             units_per_case = units.loc[sku, 'unitspercase']
             if units_per_case == 0:
                 units_per_case = units.loc[sku, 'Units']
             cartons[carton_id] = Carton(carton_id, active=item_master[sku].active, sku=sku, quantity=units_per_case)
+            carton_data.append({'id':carton_id,
+                                'active':item_master[sku].active,
+                                'sku':sku, 'quantity':units_per_case,
+                                'allocated': False})
             units.loc[sku, 'Units'] -= min(units_per_case, units.loc[sku, 'Units'])
             carton_id += 1
+    carton_data = pd.DataFrame(carton_data)
+    carton_data = carton_data.set_index('id')
     print('{} Cartons created.'.format(len(cartons)))
 
     start = print_timer(debug, start, 'Initialized Totes')
@@ -139,14 +158,20 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
         loop += 1
         for pw in put_walls.values():
             log = pw.fill_from_queue(1)
+            if log:
+                carton_data.iloc[log[0]['carton_id']]['quantity'] -= sum([m['quantity'] for m in log])
+                if carton_data.iloc[[log[0]['carton_id']]]['quantity'].sum() == 0:
+                    carton_data.iloc[[log[0]['carton_id']]]['active'] = False
             if debug: print(log)
             start = print_timer(debug, start, 'Fill from Q')
             empty_slots = []
             for slot in [s for s in pw.slots.values() if s.is_clear()]:
                 if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
                 orders[slot.order].lines = slot.alloc_lines
-                order_data.update(pd.DataFrame([{'store': slot.order, 'sku': l.sku, 'units': l.quantity}
-                                   for l in slot.alloc_lines]).set_index(['store', 'sku']))
+                order_data.loc[[(slot.order, l.sku) for l in slot.alloc_lines
+                                if l.status == 'Updated'], 'units'] = [l.quantity
+                                                                       for l in slot.alloc_lines
+                                                                       if l.status == 'Updated']
                 if sum([l.quantity for l in orders[slot.order].lines]) == 0:
                     del orders[slot.order]
                     print('Order closed: {}'.format(slot.order))
@@ -159,17 +184,20 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 store, lines = assign_store(pw=pw,
                                             orders=orders,
                                             order_data=order_data,
-                                            cartons=cartons)
+                                            )
                 if store is None:
                     break
                 slot.assign(order=store, alloc_lines=lines)
                 orders[store].allocated = True
                 if debug: print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
             start = print_timer(debug, start, 'Store allocation')
-            carton = assign_carton(pw=pw, orders=orders, cartons=cartons)
-            if carton:
-                pw.add_to_queue(carton)
-                carton.allocated = True
+            carton_id = assign_carton(pw=pw, carton_data=carton_data)
+            if carton_id:
+                pw.add_to_queue(cartons[carton_id])
+                start = print_timer(debug, start, 'Add carton to queue')
+                cartons[carton_id].allocated = True
+                carton_data.iloc[carton_id]['allocated'] = True
+                start = print_timer(debug, start, 'Set allocation')
                 if debug: print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
             start = print_timer(debug, start, 'Carton allocation')
@@ -177,9 +205,9 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             # Release more SKUs
             active_units = sum([c.quantity for c in cartons.values() if c.active == True])
             if active_units < 500000:
-                print('Releasing more SKUs...')
                 inactive_skus = [k for k, v in item_master.items() if v.active == False]
                 if inactive_skus:
+                    print('Releasing more SKUs...')
                     activate_skus = np.random.choice(inactive_skus, size=100)
                     for sku in active_skus:
                         item_master[sku].active = True

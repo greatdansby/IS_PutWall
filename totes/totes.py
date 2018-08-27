@@ -12,7 +12,7 @@ class Tote:
         self.compartments[compartment.id] = compartment
 
     def get_contents(self, active_only=True):
-        skus = set([c.sku for c in self.compartments.values() if active_only and c.active == active_only]) #TODO fix
+        skus = set([c.sku for c in self.compartments.values() if active_only and c.active == active_only])
         return {sku: self.get_qty(sku=sku, active_only=active_only) for sku in skus}
 
     def update_quantity(self, sku, qty):
