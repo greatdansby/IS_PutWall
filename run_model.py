@@ -24,7 +24,7 @@ def print_timer(debug, start, label=''):
 
 def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_table='dbo.Burlington0501to0511',
               date='5/11/2017'):
-    debug = True
+    debug = False
     initialize = False
     start = time.time()
 
@@ -191,16 +191,15 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 orders[store].allocated = True
                 if debug: print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
             start = print_timer(debug, start, 'Store allocation')
-            carton_id = assign_carton(pw=pw, carton_data=carton_data)
+            carton_id = assign_carton(pw=pw, carton_data=carton_data, cartons=cartons)
+            start = print_timer(debug, start, 'Carton allocation')
             if carton_id:
                 pw.add_to_queue(cartons[carton_id])
-                start = print_timer(debug, start, 'Add carton to queue')
                 cartons[carton_id].allocated = True
-                carton_data.iloc[carton_id]['allocated'] = True
+                carton_data.at[carton_id, 'allocated'] = True
                 start = print_timer(debug, start, 'Set allocation')
                 if debug: print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
-            start = print_timer(debug, start, 'Carton allocation')
 
             # Release more SKUs
             active_units = sum([c.quantity for c in cartons.values() if c.active == True])

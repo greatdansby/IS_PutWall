@@ -31,6 +31,10 @@ def assign_store(**kwargs):
     return None, None
 
 
+def pick_clean(alloc, row):
+    return alloc[row['sku']]/alloc['quantity'] >= 1
+
+
 def assign_carton(**kwargs):
     '''
 
@@ -39,18 +43,28 @@ def assign_carton(**kwargs):
     :param kwargs:
     :return:
     '''
+    debug = False
+    start = time.time()
 
     pw_demand = kwargs['pw'].get_allocation()
-    cartons_not_in_queue = [carton for carton in kwargs['cartons'].values()
-                          if (carton not in kwargs['pw'].queue and
-                              carton.active and
-                              carton.allocated == False and
-                              carton.sku in pw_demand)]
-    for carton in cartons_not_in_queue:
-        if pw_demand[carton.sku]/carton.quantity >= 1:
-            return carton
-    if cartons_not_in_queue:
-        return sorted([(carton, pw_demand[carton.sku]) for carton in cartons_not_in_queue], key=lambda k: -k[1])[0][0]
+    start = print_timer(debug, start, 'Get Allocation')
+    cd = kwargs['carton_data']
+    cartons_not_in_queue = cd.loc[~cd.index.isin(kwargs['pw'].queue) &
+                                  (cd['active'] == True) &
+                                  (cd['allocated'] == False) &
+                                  (cd['sku'].isin(pw_demand))]
+    start = print_timer(debug, start, 'Get cartons')
+    avail_cartons = cartons_not_in_queue.loc[cartons_not_in_queue['quantity'].isin(set(pw_demand.values()))]
+    start = print_timer(debug, start, 'Avail cartons')
+    if not avail_cartons.empty:
+        idx = avail_cartons.first_valid_index()
+        start = print_timer(debug, start, 'Get index')
+        return idx
+    elif not cartons_not_in_queue.empty:
+        idx = cartons_not_in_queue.sort_values(by='quantity', ascending=False).first_valid_index()
+        start = print_timer(debug, start, 'Get index no clean picks')
+        return idx
+    print('No cartons found fo assignment')
     return None
 
 
