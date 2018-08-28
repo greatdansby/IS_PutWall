@@ -145,6 +145,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     print('{} Cartons created.'.format(len(cartons)))
 
     start = print_timer(debug, start, 'Initialized Totes')
+    loop_time = time.time()
 
     count_carton_pulls = 0
     units_shipped = 0
@@ -154,16 +155,19 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
         print('Open Orders: {}'.format(len([o for o in orders.values() if sum([l.quantity for l in o.lines]) > 0])))
         print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
         print('Active Units: {}'.format(sum([c.quantity for c in cartons.values() if c.active == True])))
-        start = print_timer(True, start, 'Loop Start')
+
+        loop_time = print_timer(True, loop_time, 'Loop Start')
         loop += 1
         for pw in put_walls.values():
             log = pw.fill_from_queue(1)
             if log:
-                carton_data.iloc[log[0]['carton_id']]['quantity'] -= sum([m['quantity'] for m in log])
-                if carton_data.iloc[[log[0]['carton_id']]]['quantity'].sum() == 0:
-                    carton_data.iloc[[log[0]['carton_id']]]['active'] = False
+                carton_data.at[log[0]['carton_id'], 'quantity'] -= sum([m['quantity'] for m in log])
+                if carton_data.at[log[0]['carton_id'], 'quantity'].sum() == 0:
+                    carton_data.at[log[0]['carton_id'], 'active'] = False
+                    carton_data.at[log[0]['carton_id'], 'allocated'] = False
             if debug: print(log)
             start = print_timer(debug, start, 'Fill from Q')
+
             empty_slots = []
             for slot in [s for s in pw.slots.values() if s.is_clear()]:
                 if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
@@ -180,6 +184,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 slot.capacity = np.random.randint(25, 35)
                 empty_slots.append(slot)
             start = print_timer(debug, start, 'Empty Slots')
+
             for slot in empty_slots:
                 store, lines = assign_store(pw=pw,
                                             orders=orders,
@@ -191,18 +196,18 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 orders[store].allocated = True
                 if debug: print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
             start = print_timer(debug, start, 'Store allocation')
+
             carton_id = assign_carton(pw=pw, carton_data=carton_data, cartons=cartons)
-            start = print_timer(debug, start, 'Carton allocation')
             if carton_id:
                 pw.add_to_queue(cartons[carton_id])
                 cartons[carton_id].allocated = True
                 carton_data.at[carton_id, 'allocated'] = True
-                start = print_timer(debug, start, 'Set allocation')
                 if debug: print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
+            start = print_timer(debug, start, 'Carton allocation')
 
             # Release more SKUs
-            active_units = sum([c.quantity for c in cartons.values() if c.active == True])
+            active_units = carton_data[carton_data['active']==True]['quantity'].sum()
             if active_units < 500000:
                 inactive_skus = [k for k, v in item_master.items() if v.active == False]
                 if inactive_skus:
@@ -212,6 +217,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                         item_master[sku].active = True
                     for carton in cartons.values():
                         carton.active = item_master[carton.sku].active
+            start = print_timer(debug, start, 'Release more SKUs')
+
 
     count_carton_returns = count_carton_pulls - len([t for t in cartons.values() if t.active == False])
     print('Carton Pulls: {}'.format(count_carton_pulls))
