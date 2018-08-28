@@ -162,9 +162,9 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             log = pw.fill_from_queue(1)
             if log:
                 carton_data.at[log[0]['carton_id'], 'quantity'] -= sum([m['quantity'] for m in log])
+                carton_data.at[log[0]['carton_id'], 'allocated'] = False
                 if carton_data.at[log[0]['carton_id'], 'quantity'].sum() == 0:
                     carton_data.at[log[0]['carton_id'], 'active'] = False
-                    carton_data.at[log[0]['carton_id'], 'allocated'] = False
             if debug: print(log)
             start = print_timer(debug, start, 'Fill from Q')
 

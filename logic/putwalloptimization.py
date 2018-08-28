@@ -64,7 +64,7 @@ def assign_carton(**kwargs):
         idx = cartons_not_in_queue.sort_values(by='quantity', ascending=False).first_valid_index()
         start = print_timer(debug, start, 'Get index no clean picks')
         return idx
-    print('No cartons found for assignment')
+    print('No cartons found for  assignment')
     return None
 
 
