@@ -18,7 +18,7 @@ class PutWall:
         print('Warning: No tote provided')
         return False
 
-    def fill_from_queue(self, num_obj):
+    def fill_from_queue(self, num_obj, loop):
         debug = False
         log = []
         for n in range(min(num_obj, len(self.queue))):
@@ -53,7 +53,12 @@ class PutWall:
                     if carton.quantity == 0:
                         carton.active = False
                     carton.allocated = False
-                    log.append({'quantity':qty_moved, 'sku':carton.sku, 'carton_id':carton.id, 'order':slot.order})
+                    log.append({'quantity': qty_moved,
+                                'sku': carton.sku,
+                                'carton_id': carton.id,
+                                'order': slot.order,
+                                'putwall': self.id,
+                                'loop': loop})
         if log == []:
             print('No fulfillment')
         return log

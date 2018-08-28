@@ -52,7 +52,7 @@ def assign_carton(**kwargs):
     cartons_not_in_queue = cd.loc[~cd.index.isin(kwargs['pw'].queue) &
                                   (cd['active'] == True) &
                                   (cd['allocated'] == False) &
-                                  (cd['sku'].isin(pw_demand))]
+                                  (cd['sku'].isin(pw_demand.keys()))]
     start = print_timer(debug, start, 'Get cartons')
     avail_cartons = cartons_not_in_queue.loc[cartons_not_in_queue['quantity'].isin(set(pw_demand.values()))]
     start = print_timer(debug, start, 'Avail cartons')
@@ -64,7 +64,7 @@ def assign_carton(**kwargs):
         idx = cartons_not_in_queue.sort_values(by='quantity', ascending=False).first_valid_index()
         start = print_timer(debug, start, 'Get index no clean picks')
         return idx
-    print('No cartons found for assignment')
+    print('No cartons found for  assignment')
     return None
 
 
@@ -122,3 +122,5 @@ def get_store_affinity(pw, orders, order_data):
     start = print_timer(debug, start, 'Store sort')
 
     return top_stores
+
+##TODO add pass logic function

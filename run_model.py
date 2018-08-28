@@ -6,7 +6,7 @@ from logic.putwalloptimization import assign_store, assign_carton, get_top_store
 import sqlalchemy as sa
 import pandas as pd
 import numpy as np
-import time
+import time, csv
 
 # create engine for quering using sqlalchemy
 engine = sa.create_engine('mssql+pyodbc://sa:FT123!@#@lab-sqlserver3.invata.com\SQL2014/Burlington?driver=SQL+Server+Native+Client+11.0')
@@ -28,7 +28,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     initialize = False
     start = time.time()
 
-    ## Initialize orders
+# Initialize orders
     orders = {}
     if initialize:
         data_store = pd.HDFStore('data_20180827.h5')
@@ -150,21 +150,23 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     count_carton_pulls = 0
     units_shipped = 0
     loop = 0
+    output = []
     while len(orders) > 0:
         print('Loop: {}\nCarton Pulls: {}'.format(loop, count_carton_pulls))
         print('Open Orders: {}'.format(len([o for o in orders.values() if sum([l.quantity for l in o.lines]) > 0])))
         print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
-        print('Active Units: {}'.format(sum([c.quantity for c in cartons.values() if c.active == True])))
+        print('Active Units: {}'.format(carton_data[carton_data['active'] == True]['quantity'].sum()))
 
         loop_time = print_timer(True, loop_time, 'Loop Start')
         loop += 1
         for pw in put_walls.values():
-            log = pw.fill_from_queue(1)
+            log = pw.fill_from_queue(1, loop)
             if log:
                 carton_data.at[log[0]['carton_id'], 'quantity'] -= sum([m['quantity'] for m in log])
+                carton_data.at[log[0]['carton_id'], 'allocated'] = False
                 if carton_data.at[log[0]['carton_id'], 'quantity'].sum() == 0:
-                    carton_data.at[log[0]['carton_id'], 'active'] = False
-                    carton_data.at[log[0]['carton_id'], 'allocated'] = False
+                    carton_data.at[log[0]['carton_id'], 'active'] = False #TODO add tote passing
+                output.extend(log)
             if debug: print(log)
             start = print_timer(debug, start, 'Fill from Q')
 
@@ -206,19 +208,27 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 count_carton_pulls += 1
             start = print_timer(debug, start, 'Carton allocation')
 
-            # Release more SKUs
-            active_units = carton_data[carton_data['active']==True]['quantity'].sum()
-            if active_units < 500000:
-                inactive_skus = [k for k, v in item_master.items() if v.active == False]
-                if inactive_skus:
-                    print('Releasing more SKUs...')
-                    activate_skus = np.random.choice(inactive_skus, size=100)
-                    for sku in active_skus:
-                        item_master[sku].active = True
-                    for carton in cartons.values():
-                        carton.active = item_master[carton.sku].active
-            start = print_timer(debug, start, 'Release more SKUs')
+        # Release more SKUs
+        active_units = carton_data[carton_data['active'] == True]['quantity'].sum()
+        if active_units < 500000:
+            inactive_skus = [k for k, v in item_master.items() if v.active == False]
+            if inactive_skus:
+                print('Releasing more SKUs...')
+                active_skus = np.random.choice(inactive_skus, size=1000)
+                for sku in active_skus:
+                    item_master[sku].active = True
+                update_carton_ids = [carton.id for carton in cartons.values()
+                                     if item_master[carton.sku].active and carton.active == False]
+                for carton_id in update_carton_ids:
+                    cartons[carton_id].active = True
+                carton_data.active.iloc[update_carton_ids] = True
+        start = print_timer(debug, start, 'Release more SKUs')
 
+    file = open('output.csv', 'w')
+    writer = csv.DictWriter(file, fieldnames=output[0].keys())
+    writer.writeheader()
+    writer.writerows(output)
+    file.close()
 
     count_carton_returns = count_carton_pulls - len([t for t in cartons.values() if t.active == False])
     print('Carton Pulls: {}'.format(count_carton_pulls))
