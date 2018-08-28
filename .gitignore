@@ -1,4 +1,4 @@
 *.csv
 *.h5
 *.xml
-.*
+.idea
