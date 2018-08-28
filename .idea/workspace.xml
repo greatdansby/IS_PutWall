@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8d119f53-98c0-482a-8303-34259e0376ae" name="Default Changelist" comment="Tried using a single large matrix for all SKUs/Locations. Method took longer than original. Back to the drawing board.">
+    <list default="true" id="8d119f53-98c0-482a-8303-34259e0376ae" name="Default Changelist" comment="Fixed carton depletion bug.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logic/putwalloptimization.py" beforeDir="false" afterPath="$PROJECT_DIR$/logic/putwalloptimization.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_model.py" afterDir="false" />
@@ -35,14 +35,14 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="17" />
-          <entry key="py" value="23712" />
-          <entry key="txt" value="190" />
+          <entry key="py" value="23728" />
+          <entry key="txt" value="217" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="190" />
-          <entry key="Python" value="23729" />
+          <entry key="PLAIN_TEXT" value="217" />
+          <entry key="Python" value="23745" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages">
@@ -94,14 +94,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="987">
-              <caret line="66" column="31" selection-start-line="66" selection-start-column="31" selection-end-line="66" selection-end-column="31" />
+            <state relative-caret-position="178">
+              <caret line="66" column="32" selection-start-line="66" selection-start-column="32" selection-end-line="66" selection-end-column="32" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1535403856298" expanded="true" signature="1160:1163" ph="..." />
+                <marker date="1535480911445" expanded="true" signature="1160:1163" ph="..." />
               </folding>
             </state>
           </provider>
@@ -125,11 +125,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="546">
-              <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
+            <state relative-caret-position="408">
+              <caret line="153" column="41" selection-start-line="153" selection-start-column="41" selection-end-line="153" selection-end-column="41" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -204,8 +204,8 @@
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/totes/totes.py" />
         <option value="$PROJECT_DIR$/putwall/putwall.py" />
-        <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
         <option value="$PROJECT_DIR$/run_model.py" />
+        <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
       </list>
     </option>
   </component>
@@ -319,7 +319,14 @@
       <option name="project" value="LOCAL" />
       <updated>1535398602527</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Fixed carton depletion bug.">
+      <created>1535468841613</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1535468841613</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView">
@@ -333,20 +340,19 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
       <window_info content_ui="combo" id="Project" order="1" weight="0.14754099" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
-      <window_info id="Debug" order="3" weight="0.34637758" />
-      <window_info active="true" id="Run" order="4" visible="true" weight="0.34267583" />
+      <window_info id="Debug" order="3" visible="true" weight="0.34637758" />
+      <window_info id="Run" order="4" weight="0.34267583" />
       <window_info anchor="bottom" id="Messages" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.3295583" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="2" weight="0.3295583" />
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" />
-      <window_info anchor="bottom" id="Version Control" order="5" weight="0.3295583" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="5" visible="true" weight="0.3295583" />
       <window_info anchor="bottom" id="Cvs" order="6" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="7" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="8" weight="0.3295583" />
@@ -381,10 +387,18 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fixed order syncing with order_data" />
     <MESSAGE value="Tried using a single large matrix for all SKUs/Locations. Method took longer than original. Back to the drawing board." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tried using a single large matrix for all SKUs/Locations. Method took longer than original. Back to the drawing board." />
+    <MESSAGE value="Fixed carton depletion bug." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed carton depletion bug." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/logic/putwalloptimization.py</url>
+          <line>66</line>
+          <option name="timeStamp" value="129" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -606,17 +620,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="987">
-          <caret line="66" column="31" selection-start-line="66" selection-start-column="31" selection-end-line="66" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <marker date="1535403856298" expanded="true" signature="1160:1163" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="821">
@@ -636,10 +639,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/run_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="546">
-          <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
+        <state relative-caret-position="408">
+          <caret line="153" column="41" selection-start-line="153" selection-start-column="41" selection-end-line="153" selection-end-column="41" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="66" column="32" selection-start-line="66" selection-start-column="32" selection-end-line="66" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1535480911445" expanded="true" signature="1160:1163" ph="..." />
           </folding>
         </state>
       </provider>
