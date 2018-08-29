@@ -135,8 +135,9 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 units_per_case = units.loc[sku, 'Units']
             cartons[carton_id] = Carton(carton_id, active=item_master[sku].active, sku=sku, quantity=units_per_case)
             carton_data.append({'id':carton_id,
-                                'active':item_master[sku].active,
-                                'sku':sku, 'quantity':units_per_case,
+                                'active': item_master[sku].active,
+                                'sku': sku,
+                                'quantity': units_per_case,
                                 'allocated': False})
             units.loc[sku, 'Units'] -= min(units_per_case, units.loc[sku, 'Units'])
             carton_id += 1
@@ -178,10 +179,10 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                                 if l.status == 'Updated'], 'units'] = [l.quantity
                                                                        for l in slot.alloc_lines
                                                                        if l.status == 'Updated']
+                orders[slot.order].allocated = False
                 if sum([l.quantity for l in orders[slot.order].lines]) == 0:
                     del orders[slot.order]
                     print('Order closed: {}'.format(slot.order))
-                orders[slot.order].allocated = False
                 slot.clear()
                 slot.capacity = np.random.randint(25, 35)
                 empty_slots.append(slot)
@@ -206,7 +207,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 carton_data.at[carton_id, 'allocated'] = True
                 if debug: print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
-            else:
+            elif loop > 1:
                 # Release more SKUs
                 inactive_skus = [k for k, v in item_master.items() if v.active == False]
                 if inactive_skus:
