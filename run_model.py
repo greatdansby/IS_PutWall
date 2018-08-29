@@ -26,6 +26,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
               date='5/11/2017'):
     debug = False
     initialize = False
+    np.random.seed(32)
     start = time.time()
 
 # Initialize orders
@@ -33,7 +34,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     if initialize:
         data_store = pd.HDFStore('data_20180827.h5')
 
-        sql_query = '''select ShipTo as store,
+        sql_query = '''select Top 1000 ShipTo as store,
                         sku,
                         UnitQty_Future as units,
                         0 as fulfilled
@@ -51,7 +52,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             print('Added store order: {}'.format(line['store']))
             orders[line['store']] = Order(id=line['store'])
         orders[line['store']].add_line(Line(sku=line['sku'], quantity=line['units']))
-    order_data = order_data.set_index(['store','sku'])
+    order_data = order_data.set_index(['store', 'sku'])
     print('{} Open Lines Initialized'.format(sum([o.line_status() for o in orders.values()])))
 
     start = print_timer(debug, start, 'Initialized orders')
@@ -112,7 +113,6 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     order_array = pd.DataFrame([[l.sku, l.quantity] for o in orders.values() for l in o.lines])
     sku_demand = order_array.groupby(0).sum()
     sku_list = sku_demand.index
-    np.random.seed(32)
     active_skus = np.random.choice(sku_list, size=int(len(sku_list)*.6))
     for sku in active_skus:
         item_master[sku].active = False
@@ -152,10 +152,14 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     units_shipped = 0
     loop = 0
     output = []
-    while len(orders) > 0:
+    open_lines = []
+    while order_data['units'].sum() > 0:
+        if sum(order_data[order_data['units'] > 0].units) == sum(open_lines):
+            print('Nothing left')
         print('Loop: {}\nCarton Pulls: {}'.format(loop, count_carton_pulls))
-        print('Open Orders: {}'.format(len([o for o in orders.values() if sum([l.quantity for l in o.lines]) > 0])))
-        print('Open Lines: {}'.format(len([l for o in orders.values() for l in o.lines if l.quantity > 0])))
+        open_lines = list(order_data[order_data['units'] > 0].units)
+        print('Open Lines: {}'.format(len(open_lines)))
+        print('Open Units: {}'.format(sum(open_lines)))
         print('Active Units: {}'.format(carton_data[carton_data['active'] == True]['quantity'].sum()))
 
         loop_time = print_timer(True, loop_time, 'Loop Start')
@@ -167,22 +171,26 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 carton_data.at[log[0]['carton_id'], 'allocated'] = False
                 if carton_data.at[log[0]['carton_id'], 'quantity'].sum() == 0:
                     carton_data.at[log[0]['carton_id'], 'active'] = False #TODO add tote passing
+                order_data.loc[[(r['order'], r['sku']) for r in log], 'units'] -= [r['quantity'] for r in log]
                 output.extend(log)
             if debug: print(log)
             start = print_timer(debug, start, 'Fill from Q')
 
             empty_slots = []
             for slot in [s for s in pw.slots.values() if s.is_clear()]:
-                if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
-                orders[slot.order].lines = slot.alloc_lines
-                order_data.loc[[(slot.order, l.sku) for l in slot.alloc_lines
-                                if l.status == 'Updated'], 'units'] = [l.quantity
-                                                                       for l in slot.alloc_lines
-                                                                       if l.status == 'Updated']
-                orders[slot.order].allocated = False
-                if sum([l.quantity for l in orders[slot.order].lines]) == 0:
-                    del orders[slot.order]
-                    print('Order closed: {}'.format(slot.order))
+                if slot.order is not None:
+                    if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
+                    orders[slot.order].lines = slot.alloc_lines
+                    if slot.order == 'ST0002' and slot.alloc_lines[41].status == 'Updated':
+                        print('Debug')
+                    order_data.loc[[(slot.order, l.sku) for l in slot.alloc_lines
+                                    if l.status == 'Updated'], 'units'] = [l.quantity
+                                                                           for l in slot.alloc_lines
+                                                                           if l.status == 'Updated']
+                    orders[slot.order].allocated = False
+                    if sum([l.quantity for l in orders[slot.order].lines]) == 0:
+                        del orders[slot.order]
+                        print('Order closed: {}'.format(slot.order))
                 slot.clear()
                 slot.capacity = np.random.randint(25, 35)
                 empty_slots.append(slot)
@@ -209,9 +217,9 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 count_carton_pulls += 1
             elif loop > 1:
                 # Release more SKUs
+                print('Releasing more SKUs...')
                 inactive_skus = [k for k, v in item_master.items() if v.active == False]
                 if inactive_skus:
-                    print('Releasing more SKUs...')
                     active_skus = np.random.choice(inactive_skus, size=1000)
                     for sku in active_skus:
                         item_master[sku].active = True
@@ -234,4 +242,4 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))
 
 if __name__ == '__main__':
-    run_model()
+    run_model(num_putwalls=2)

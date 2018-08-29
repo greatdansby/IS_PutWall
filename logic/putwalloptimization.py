@@ -121,6 +121,8 @@ def get_store_affinity(pw, orders, order_data):
     top_stores = list(order_demand.sort_values('units', ascending=False).index)
     start = print_timer(debug, start, 'Store sort')
 
+    if not top_stores and stores_avail_for_alloc:
+        return stores_avail_for_alloc
     return top_stores
 
 ##TODO add pass logic function
