@@ -23,7 +23,7 @@ def print_timer(debug, start, label=''):
 
 
 def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_table='dbo.Burlington0501to0511',
-              date='5/11/2017'):
+              date='5/11/2017', output_file='output.csv'):
     debug = False
     initialize = False
     np.random.seed(32)
@@ -230,7 +230,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                     carton_data.active.iloc[update_carton_ids] = True
                 start = print_timer(debug, start, 'Release more SKUs')
 
-    file = open('output.csv', 'w')
+    file = open(output_file, 'w')
     writer = csv.DictWriter(file, fieldnames=output[0].keys())
     writer.writeheader()
     writer.writerows(output)
@@ -242,4 +242,4 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))
 
 if __name__ == '__main__':
-    run_model(num_putwalls=2)
+    run_model(output_file='passing_test.csv')
