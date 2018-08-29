@@ -2,7 +2,7 @@ from putwall.putwall import PutWall, PutSlot
 from cartons.cartons import Carton
 from skus.skus import SKU
 from orders.orders import Order, Line
-from logic.putwalloptimization import assign_store, assign_carton, get_top_stores
+from logic.putwalloptimization import assign_store, assign_carton, get_top_stores, pass_to_pw
 import sqlalchemy as sa
 import pandas as pd
 import numpy as np
@@ -34,7 +34,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     if initialize:
         data_store = pd.HDFStore('data_20180827.h5')
 
-        sql_query = '''select Top 1000 ShipTo as store,
+        sql_query = '''select ShipTo as store,
                         sku,
                         UnitQty_Future as units,
                         0 as fulfilled
@@ -170,7 +170,10 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 carton_data.at[log[0]['carton_id'], 'quantity'] -= sum([m['quantity'] for m in log])
                 carton_data.at[log[0]['carton_id'], 'allocated'] = False
                 if carton_data.at[log[0]['carton_id'], 'quantity'].sum() == 0:
-                    carton_data.at[log[0]['carton_id'], 'active'] = False #TODO add tote passing
+                    carton_data.at[log[0]['carton_id'], 'active'] = False
+                else:
+                    # Pass non-empty totes to another put-wall if available
+                    pass_to_pw(cartons[log[0]['carton_id']], put_walls, pw.id)
                 order_data.loc[[(r['order'], r['sku']) for r in log], 'units'] -= [r['quantity'] for r in log]
                 output.extend(log)
             if debug: print(log)
@@ -181,12 +184,6 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
                 if slot.order is not None:
                     if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
                     orders[slot.order].lines = slot.alloc_lines
-                    if slot.order == 'ST0002' and slot.alloc_lines[41].status == 'Updated':
-                        print('Debug')
-                    order_data.loc[[(slot.order, l.sku) for l in slot.alloc_lines
-                                    if l.status == 'Updated'], 'units'] = [l.quantity
-                                                                           for l in slot.alloc_lines
-                                                                           if l.status == 'Updated']
                     orders[slot.order].allocated = False
                     if sum([l.quantity for l in orders[slot.order].lines]) == 0:
                         del orders[slot.order]
@@ -242,4 +239,4 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))
 
 if __name__ == '__main__':
-    run_model(num_putwalls=2)
+    run_model()

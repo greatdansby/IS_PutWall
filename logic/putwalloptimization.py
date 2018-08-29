@@ -125,4 +125,12 @@ def get_store_affinity(pw, orders, order_data):
         return stores_avail_for_alloc
     return top_stores
 
-##TODO add pass logic function
+def pass_to_pw(carton, put_walls, pw_id):
+    pw_list = sorted([(k, min(abs(pw_id-k), len(put_walls.keys())-abs(pw_id-k-1)))
+                      for k in put_walls.keys()], lambda k: k[1])
+    for pw, _ in pw_list:
+        alloc = put_walls[pw].get_allocation()
+        if carton.sku in alloc:
+            put_walls[pw].add_to_queue(carton)
+            return True
+    return False
