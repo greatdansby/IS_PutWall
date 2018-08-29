@@ -200,29 +200,26 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
             start = print_timer(debug, start, 'Store allocation')
 
             carton_id = assign_carton(pw=pw, carton_data=carton_data, cartons=cartons)
-            if carton_id:
+            if carton_id is not None:
                 pw.add_to_queue(cartons[carton_id])
                 cartons[carton_id].allocated = True
                 carton_data.at[carton_id, 'allocated'] = True
                 if debug: print('Carton added to queue for Put-Wall {}'.format(pw.id))
                 count_carton_pulls += 1
-            start = print_timer(debug, start, 'Carton allocation')
-
-        # Release more SKUs
-        active_units = carton_data[carton_data['active'] == True]['quantity'].sum()
-        if active_units < 500000:
-            inactive_skus = [k for k, v in item_master.items() if v.active == False]
-            if inactive_skus:
-                print('Releasing more SKUs...')
-                active_skus = np.random.choice(inactive_skus, size=1000)
-                for sku in active_skus:
-                    item_master[sku].active = True
-                update_carton_ids = [carton.id for carton in cartons.values()
-                                     if item_master[carton.sku].active and carton.active == False]
-                for carton_id in update_carton_ids:
-                    cartons[carton_id].active = True
-                carton_data.active.iloc[update_carton_ids] = True
-        start = print_timer(debug, start, 'Release more SKUs')
+            else:
+                # Release more SKUs
+                inactive_skus = [k for k, v in item_master.items() if v.active == False]
+                if inactive_skus:
+                    print('Releasing more SKUs...')
+                    active_skus = np.random.choice(inactive_skus, size=1000)
+                    for sku in active_skus:
+                        item_master[sku].active = True
+                    update_carton_ids = [carton.id for carton in cartons.values()
+                                         if item_master[carton.sku].active and carton.active == False]
+                    for carton_id in update_carton_ids:
+                        cartons[carton_id].active = True
+                    carton_data.active.iloc[update_carton_ids] = True
+                start = print_timer(debug, start, 'Release more SKUs')
 
     file = open('output.csv', 'w')
     writer = csv.DictWriter(file, fieldnames=output[0].keys())
