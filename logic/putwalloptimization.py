@@ -127,10 +127,11 @@ def get_store_affinity(pw, orders, order_data):
 
 def pass_to_pw(carton, put_walls, pw_id):
     pw_list = sorted([(k, min(abs(pw_id-k), len(put_walls.keys())-abs(pw_id-k-1)))
-                      for k in put_walls.keys()], lambda k: k[1])
-    for pw, _ in pw_list:
+                      for k in put_walls.keys() if k != pw_id], key=lambda k: k[1])
+    for pw, _ in pw_list[:18]:
         alloc = put_walls[pw].get_allocation()
         if carton.sku in alloc:
-            put_walls[pw].add_to_queue(carton)
-            return True
+            if alloc[carton.sku] >= carton.quantity:
+                put_walls[pw].add_to_queue(carton)
+                return True
     return False

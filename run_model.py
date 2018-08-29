@@ -153,6 +153,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
     loop = 0
     output = []
     open_lines = []
+    passes = 0
     while order_data['units'].sum() > 0:
         if sum(order_data[order_data['units'] > 0].units) == sum(open_lines):
             print('Nothing left')
@@ -171,10 +172,21 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                 carton_data.at[log[0]['carton_id'], 'allocated'] = False
                 if carton_data.at[log[0]['carton_id'], 'quantity'].sum() == 0:
                     carton_data.at[log[0]['carton_id'], 'active'] = False
+                    del cartons[log[0]['carton_id']]
                 else:
                     # Pass non-empty totes to another put-wall if available
-                    pass_to_pw(cartons[log[0]['carton_id']], put_walls, pw.id)
+                    if pass_to_pw(cartons[log[0]['carton_id']], put_walls, pw.id):
+                        passes += 1
+                        cartons[log[0]['carton_id']].allocated = True
+                        carton_data.at[log[0]['carton_id'], 'allocated'] = True
+
                 order_data.loc[[(r['order'], r['sku']) for r in log], 'units'] -= [r['quantity'] for r in log]
+                closed_orders = [k for k, v in (order_data.groupby('store').units.sum()== 0).to_dict().items() if v]
+                for order_id in closed_orders:
+                    if order_id in orders: del orders[order_id]
+                for slot in pw.slots.values():
+                    if slot.order in closed_orders:
+                        slot.clear()
                 output.extend(log)
             if debug: print(log)
             start = print_timer(debug, start, 'Fill from Q')
@@ -237,10 +249,12 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
     print('Carton Pulls: {}'.format(count_carton_pulls))
     print('Carton Returns: {}'.format(count_carton_returns))
     print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))
+    print('Carton Passes: {}'.format(passes))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output_file', '-o')
     parser.add_argument('--num_putwalls', '-n', type=int)
+    parser.add_argument('--num_slot_per_wall', '-s', type=int)
     args = parser.parse_args()
     run_model(**vars(args))
