@@ -7,6 +7,8 @@ import sqlalchemy as sa
 import pandas as pd
 import numpy as np
 import time, csv, argparse
+from utilities import print_timer
+from load_data import load_from_db
 
 # create engine for quering using sqlalchemy
 engine = sa.create_engine('mssql+pyodbc://sa:FT123!@#@lab-sqlserver3.invata.com\SQL2014/Burlington?driver=SQL+Server+Native+Client+11.0')
@@ -14,50 +16,33 @@ receiving_table = 'tblReceiving'
 ItemMaster_table = 'dbo.tblItemMaster'
 
 
-def print_timer(debug, start, label=''):
-    buffer = '-'*max(30-len(label), 0)
-    if debug:
-        print('{}{} Elapsed Time {:.5} seconds'.format(label, buffer, time.time()-start))
-        return time.time()
-    return start
-
-
 def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0501to0511',
               date='5/11/2017', output_file='output.csv'):
+# Setup
     debug = False
     initialize = False
     np.random.seed(32)
     start = time.time()
 
 # Initialize orders
-    orders = {}
-    if initialize:
-        data_store = pd.HDFStore('data_20180827.h5')
+    sql = '''select ShipTo as store,
+                            sku,
+                            UnitQty_Future as units,
+                            0 as fulfilled
+                            From {}
+                            Where ShipDate = '{}'
+                           Order by ShipTo, SKU'''.format(order_table, date)
 
-        sql_query = '''select ShipTo as store,
-                        sku,
-                        UnitQty_Future as units,
-                        0 as fulfilled
-                        From {}
-                        Where ShipDate = '{}'
-                       Order by ShipTo, SKU'''.format(order_table, date)
-        order_data = pd.read_sql_query(sql_query, engine)
-        order_data = (order_data.groupby(['store', 'sku'])['units'].sum()).reset_index()
-        data_store['order_data'] = order_data
-    else:
-        data_store = pd.HDFStore('data_20180827.h5')
-        order_data = data_store['order_data']
-    for line in order_data.to_dict('records'):
-        if line['store'] not in orders:
-            print('Added store order: {}'.format(line['store']))
-            orders[line['store']] = Order(id=line['store'])
-        orders[line['store']].add_line(Line(sku=line['sku'], quantity=line['units']))
-    order_data = order_data.set_index(['store', 'sku'])
-    print('{} Open Lines Initialized'.format(sum([o.line_status() for o in orders.values()])))
+    orders_df = load_from_db(debug=debug,
+                             engine=engine,
+                             sql=sql,
+                             data_name='orders_df',
+                             load_from_db=initialize,
+                             data_filename='data.h5',
+                             index=['store,sku'])
 
-    start = print_timer(debug, start, 'Initialized orders')
-
-    ## Initialize all put walls
+# Initialize put walls
+#TODO init put-wall df
 
     put_walls = {}
     top_stores = get_top_stores(orders, sort='Lines')
@@ -77,38 +62,38 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 
     start = print_timer(debug, start, 'Initialized put-walls')
 
-    ## Initialize item_master
-    item_master = {}
-    if initialize:
-        sql_query = '''select sku,
-                Sum(UnitQty_Future) AS Units,
-                count(sku) AS Lines,
-                ISNULL(COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase),21) AS unitspercase
-        From {} OO
-        OUTER APPLY (
-        select AVG(RO.UOMQty) AVGUnitsPerCase,
-                MAX(RO.UOMQty) MaxUnitsPerCase
-        from tblReceiving_Old RO
-        where OO.SKU = RO.SKU) OA
-        OUTER APPLY (
-        select AVG(R.UOMQty) AVGUnitsPerCase,
-                MAX(R.UOMQty) MaxUnitsPerCase
-        from tblReceiving R
-        where OO.SKU = R.SKU) OB
-        Where ShipDate = '{}'
-        group by sku,
-                OA.MaxUnitsPerCase,
-                OB.MaxUnitsPerCase
-        order by lines desc'''.format(order_table, date)
-        item_master_data = pd.read_sql_query(sql_query, engine)
-        item_master_data.set_index('sku', inplace=True)
-        data_store['item_master_data'] = item_master_data
-    else:
-        item_master_data = data_store['item_master_data']
+# Initialize item_master
 
-    data_store.close()
+    sql = '''select sku,
+            Sum(UnitQty_Future) AS Units,
+            count(sku) AS Lines,
+            ISNULL(COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase),21) AS unitspercase
+            From {} OO
+            OUTER APPLY (
+            select AVG(RO.UOMQty) AVGUnitsPerCase,
+                    MAX(RO.UOMQty) MaxUnitsPerCase
+            from tblReceiving_Old RO
+            where OO.SKU = RO.SKU) OA
+            OUTER APPLY (
+            select AVG(R.UOMQty) AVGUnitsPerCase,
+                    MAX(R.UOMQty) MaxUnitsPerCase
+            from tblReceiving R
+            where OO.SKU = R.SKU) OB
+            Where ShipDate = '{}'
+            group by sku,
+                    OA.MaxUnitsPerCase,
+                    OB.MaxUnitsPerCase
+            order by lines desc'''.format(order_table, date)
 
-    item_master = {i: SKU(id=i) for i in item_master_data.index}
+    inventory_df = load_from_db( debug=debug,
+                                 engine=engine,
+                                 sql=sql,
+                                 data_name='inventory_df',
+                                 load_from_db=initialize,
+                                 data_filename='data.h5',
+                                 index=['sku'])
+
+    item_master = {i: SKU(id=i) for i in inventory_df.index}
     # Order sku_list by demand ascending
     order_array = pd.DataFrame([[l.sku, l.quantity] for o in orders.values() for l in o.lines])
     sku_demand = order_array.groupby(0).sum()
@@ -119,13 +104,10 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 
     start = print_timer(debug, start, 'Initialized item master')
 
-    ## Intialize inventory
+# Intialize cartons
+#TODO init carton df
     cartons = {}
-    inventory_table = pd.DataFrame(index=None,
-                             columns=['tote_id', 'sku_id', 'tote_qty', 'inv_qty', 'active', 'loop_activated'],
-                             dtype=int)
-    units = item_master_data
-    ttl_units = np.sum(units.loc[:, 'Units'])
+    units = inventory_df
     carton_id = 0
     carton_data = []
     for sku in sku_list:
