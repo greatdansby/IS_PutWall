@@ -6,7 +6,7 @@ from logic.putwalloptimization import assign_store, assign_carton, get_top_store
 import sqlalchemy as sa
 import pandas as pd
 import numpy as np
-import time, csv
+import time, csv, argparse
 
 # create engine for quering using sqlalchemy
 engine = sa.create_engine('mssql+pyodbc://sa:FT123!@#@lab-sqlserver3.invata.com\SQL2014/Burlington?driver=SQL+Server+Native+Client+11.0')
@@ -22,7 +22,7 @@ def print_timer(debug, start, label=''):
     return start
 
 
-def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_table='dbo.Burlington0501to0511',
+def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0501to0511',
               date='5/11/2017', output_file='output.csv'):
     debug = False
     initialize = False
@@ -242,4 +242,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, inventory_file=None, order_t
     print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))
 
 if __name__ == '__main__':
-    run_model(output_file='passing_test.csv')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output_file', '-o')
+    parser.add_argument('--num_putwalls', '-n', type=int)
+    args = parser.parse_args()
+    run_model(**vars(args))
