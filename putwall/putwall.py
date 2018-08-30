@@ -5,11 +5,12 @@ import time
 #TODO Add putwall_manager (future)
 
 class PutWall:
-    def __init__(self, num_slots, id, queue_length=1, facings=1, debug=False):
+    def __init__(self, num_slots, id, queue_length=5, debug=False):
         self.num_slots = num_slots
         self.id = id
         self.slots = {}
         self.queue = []
+        self.queue_length = queue_length
         self.debug = debug
 
     def add_slot(self, putslot):
@@ -27,6 +28,7 @@ class PutWall:
         start = time.time()
         # TODO generalize fill fucntion and allow override
         log = []
+        tote = None
 
         for n in range(min(num_to_process, len(self.queue))):
 
@@ -49,7 +51,7 @@ class PutWall:
 
                     slot.update_quantity(qty=qty_moved)
                     order_closed = order_handler.deplete_inv(order=slot.order, sku=tote.sku, quantity=qty_moved) #TODO not crazy about this
-                    tote_id = tote.update_quantity(-qty_moved)
+                    tote = tote.update_quantity(-qty_moved)
                     if slot.capacity - slot.quantity == 0 or order_closed: slot.clear()
 
         if log == []:
@@ -57,48 +59,25 @@ class PutWall:
 
         print_timer(self.debug, start, 'fill_from_queue')
 
-        return tote_id, log
+        return tote, log
 
-    def clear_empty_slots(self):
-        empty_slots = []
-        for id, slot in self.slots.items():
-            if slot.is_clear():
-                slot.clear()
-                empty_slots.append(id)
-        return empty_slots
+    def empty_slots(self):
+        return [slot for slot in self.slots.values() if slot.is_clear()]
 
     def find_slots(self, sku=None):
         return [slot for slot in self.slots.values() if slot.get_allocation(sku=sku) > 0]
 
-    def get_allocation(self):
-        #TODO refactor
-        allocation = {}
-        for slot in [s for s in self.slots.values() if s.active]:
-            for line in slot.alloc_lines:
-                if line.sku in allocation:
-                    allocation[line.sku] += line.quantity
-                elif line.quantity > 0:
-                    allocation[line.sku] = line.quantity
-        return allocation
-
 
 class PutSlot:
-    def __init__(self, id, alloc_lines=None, capacity=0, quantity=0, active=False, order=None):
+    def __init__(self, id, capacity=0, quantity=0, active=False, order=None):
         self.id = id
         self.active = active
         self.capacity = capacity
         self.quantity = quantity
-        self.alloc_lines = alloc_lines
         self.order = order
 
     def is_clear(self, clear_func=None):
-        if clear_func:
-            if clear_func(self):
-                return True
-            return False
-        elif not self.active or self.quantity >= self.capacity:
-            return True
-        return False
+        return self.active and self.order is None
 
     def clear(self):
         #TODO refactor

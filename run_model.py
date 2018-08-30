@@ -1,7 +1,7 @@
 from putwall.putwall import PutWall, PutSlot
 from totes.totes import Tote
 from orders.orders import Order_Handler
-from logic.putwalloptimization import assign_store, assign_carton, get_top_stores, pass_to_pw
+from logic.putwalloptimization import assign_stores, assign_totes, pass_to_pw
 import sqlalchemy as sa
 import pandas as pd
 import numpy as np
@@ -44,7 +44,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 # Initialize put walls
     put_walls = {}
     for pw in range(num_putwalls):
-        put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall, debug=debug)
+        put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall, debug=debug, queue_length=5)
         for ps in range(num_slot_per_wall):
             put_walls[pw].add_slot(PutSlot(id=ps))
 
@@ -92,12 +92,11 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 
 # Track stats
     loop_time = time.time()
-    count_carton_pulls = 0
-    units_shipped = 0
+    tote_pulls = 0
+    tote_returns = 0
+    tote_passes = 0
     loop = 0
     output = []
-    open_lines = []
-    passes = 0
 
     while order_data['units'].sum() > 0:
 
@@ -111,15 +110,19 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 # Process totes
             assign_stores(debug=debug, pw=pw, orders_df=orders_df)
 
-            tote_id, log = pw.fill_from_queue(num_to_process=, loop=loop, order_handler=order_handler)
+            tote, log = pw.fill_from_queue(num_to_process=1, loop=loop, order_handler=order_handler)
             output.extend(log)
 
-            if tote_id: #If carton didn't pick clean, pass it.
-                if pass_to_pw(debug=debug, tote_id, put_walls, orders_df): passes += 1
+            if tote: #If carton didn't pick clean, pass it.
+                if pass_to_pw(debug=debug, tote=tote, put_walls=put_walls, orders_df=orders_df, pw_id=pw.id):
+                    tote_passes += 1
+                else:
+                    tote_returns += 1
 
-            carton_id = assign_carton(debug=debug, pw=pw, carton_data=carton_data, cartons=cartons)
+            carton_ids = assign_totes(debug=debug, pw=pw, totes_df=totes_df, num_to_assign=5, orders_df=orders_df)
+            tote_pulls += len(carton_ids)
 
-            if carton_id is None and loop > 1:
+            if carton_ids is None and loop > 1:
 # Release more SKUs
                 inactive_skus = item_master_df.loc[item_master_df.active == False].index
                 if inactive_skus:
@@ -129,91 +132,18 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 
                 start = print_timer(debug, start, 'Release more SKUs')
 
-        for pw in put_walls.values():
-            log = pw.fill_from_queue(1, loop)
-            if log:
-                carton_data.at[log[0]['carton_id'], 'quantity'] -= sum([m['quantity'] for m in log])
-                carton_data.at[log[0]['carton_id'], 'allocated'] = False
-                if carton_data.at[log[0]['carton_id'], 'quantity'].sum() == 0:
-                    carton_data.at[log[0]['carton_id'], 'active'] = False
-                    del cartons[log[0]['carton_id']]
-                else:
-                    # Pass non-empty totes to another put-wall if available
-                    if pass_to_pw(cartons[log[0]['carton_id']], put_walls, pw.id):
-                        passes += 1
-                        cartons[log[0]['carton_id']].allocated = True
-                        carton_data.at[log[0]['carton_id'], 'allocated'] = True
-
-                order_data.loc[[(r['order'], r['sku']) for r in log], 'units'] -= [r['quantity'] for r in log]
-                closed_orders = [k for k, v in (order_data.groupby('store').units.sum()== 0).to_dict().items() if v]
-                for order_id in closed_orders:
-                    if order_id in orders: del orders[order_id]
-                for slot in pw.slots.values():
-                    if slot.order in closed_orders:
-                        slot.clear()
-                output.extend(log)
-            if debug: print(log)
-            start = print_timer(debug, start, 'Fill from Q')
-
-            empty_slots = []
-            for slot in [s for s in pw.slots.values() if s.is_clear()]:
-                if slot.order is not None:
-                    if debug: print('Carton for {} shipped from Put-Wall {}'.format(slot.order, pw.id))
-                    orders[slot.order].lines = slot.alloc_lines
-                    orders[slot.order].allocated = False
-                    if sum([l.quantity for l in orders[slot.order].lines]) == 0:
-                        del orders[slot.order]
-                        print('Order closed: {}'.format(slot.order))
-                slot.clear()
-                slot.capacity = np.random.randint(25, 35)
-                empty_slots.append(slot)
-            start = print_timer(debug, start, 'Empty Slots')
-
-            for slot in empty_slots:
-                store, lines = assign_store(pw=pw,
-                                            orders=orders,
-                                            order_data=order_data,
-                                            )
-                if store is None:
-                    break
-                slot.assign(order=store, alloc_lines=lines)
-                orders[store].allocated = True
-                if debug: print('Store {} assigned to Put-Wall {}'.format(store, pw.id))
-            start = print_timer(debug, start, 'Store allocation')
-
-            carton_id = assign_carton(pw=pw, carton_data=carton_data, cartons=cartons)
-            if carton_id is not None:
-                pw.add_to_queue(cartons[carton_id])
-                cartons[carton_id].allocated = True
-                carton_data.at[carton_id, 'allocated'] = True
-                if debug: print('Carton added to queue for Put-Wall {}'.format(pw.id))
-                count_carton_pulls += 1
-            elif loop > 1:
-                # Release more SKUs
-                print('Releasing more SKUs...')
-                inactive_skus = [k for k, v in item_master.items() if v.active == False]
-                if inactive_skus:
-                    active_skus = np.random.choice(inactive_skus, size=1000)
-                    for sku in active_skus:
-                        item_master[sku].active = True
-                    update_carton_ids = [carton.id for carton in cartons.values()
-                                         if item_master[carton.sku].active and carton.active == False]
-                    for carton_id in update_carton_ids:
-                        cartons[carton_id].active = True
-                    carton_data.active.iloc[update_carton_ids] = True
-                start = print_timer(debug, start, 'Release more SKUs')
-
+# Save output to file
     file = open(output_file, 'w')
     writer = csv.DictWriter(file, fieldnames=output[0].keys())
     writer.writeheader()
     writer.writerows(output)
     file.close()
 
-    count_carton_returns = count_carton_pulls - len([t for t in cartons.values() if t.active == False])
-    print('Carton Pulls: {}'.format(count_carton_pulls))
-    print('Carton Returns: {}'.format(count_carton_returns))
-    print('Carton Tote Moves: {}'.format(count_carton_pulls+count_carton_returns))
-    print('Carton Passes: {}'.format(passes))
+# Print stats
+    print('Tote Pulls: {}'.format(tote_pulls))
+    print('Tote Returns: {}'.format(tote_returns))
+    print('Total Tote Moves: {}'.format(tote_pulls+tote_returns))
+    print('Tote Passes: {}'.format(tote_passes))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
