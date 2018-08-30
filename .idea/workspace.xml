@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d119f53-98c0-482a-8303-34259e0376ae" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/totes/totes_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/load_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/load_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/orders/orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/orders.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/putwall/putwall.py" beforeDir="false" afterPath="$PROJECT_DIR$/putwall/putwall.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/totes/totes.py" beforeDir="false" afterPath="$PROJECT_DIR$/totes/totes.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,27 +26,28 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="60" />
+          <entry key="py" value="63" />
           <entry key="txt" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="PLAIN_TEXT" value="2" />
-          <entry key="Python" value="60" />
+          <entry key="Python" value="63" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="17" />
-          <entry key="py" value="26490" />
-          <entry key="txt" value="318" />
+          <entry key="dummy" value="12" />
+          <entry key="py" value="28815" />
+          <entry key="txt" value="342" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="318" />
-          <entry key="Python" value="26507" />
+          <entry key="PLAIN_TEXT" value="354" />
+          <entry key="Python" value="28832" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages">
@@ -58,8 +63,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2310">
-              <caret line="110" column="22" selection-start-line="110" selection-start-column="22" selection-end-line="110" selection-end-column="22" />
+            <state relative-caret-position="630">
+              <caret line="50" column="139" selection-start-line="50" selection-start-column="139" selection-end-line="50" selection-end-column="139" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -68,13 +73,37 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/totes/totes_old.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="294">
+              <caret line="14" column="106" selection-start-line="14" selection-start-column="106" selection-end-line="14" selection-end-column="106" />
+              <folding>
+                <marker date="1535388590140" expanded="true" signature="11:16" ph="..." />
+                <marker date="1535388590140" expanded="true" signature="1269:1369" ph="..." />
+                <marker date="1535388590140" expanded="true" signature="1543:1548" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/totes/totes.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="63">
+              <caret line="3" column="22" lean-forward="true" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/orders/orders.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="32" selection-start-column="32" selection-end-column="32" />
+            <state relative-caret-position="636">
+              <caret line="33" column="27" lean-forward="true" selection-start-line="33" selection-start-column="27" selection-end-line="33" selection-end-column="27" />
               <folding>
-                <marker date="1535600508200" expanded="true" signature="45:50" ph="..." />
-                <marker date="1535600508200" expanded="true" signature="355:360" ph="..." />
+                <marker date="1535637794637" expanded="true" signature="45:50" ph="..." />
+                <marker date="1535637794637" expanded="true" signature="355:360" ph="..." />
+                <marker date="1535637794637" expanded="true" signature="549:554" ph="..." />
               </folding>
             </state>
           </provider>
@@ -83,7 +112,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2310">
+            <state relative-caret-position="1806">
               <caret line="134" selection-start-line="134" selection-end-line="134" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -95,8 +124,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="84">
-              <caret line="4" column="33" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
+            <state relative-caret-position="168">
+              <caret line="8" lean-forward="true" selection-end-line="8" />
             </state>
           </provider>
         </entry>
@@ -104,8 +133,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="303">
-              <caret line="94" selection-start-line="94" selection-end-line="94" />
+            <state relative-caret-position="447">
+              <caret line="116" column="62" lean-forward="true" selection-start-line="116" selection-start-column="62" selection-end-line="116" selection-end-column="62" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -125,11 +154,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/load_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="10" selection-start-line="10" selection-end-line="10" />
+            <state relative-caret-position="357">
+              <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="66" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
-                <marker date="1535576600202" expanded="true" signature="171:172" ph="..." />
+                <marker date="1535633726057" expanded="true" signature="172:173" ph="..." />
               </folding>
             </state>
           </provider>
@@ -175,15 +204,15 @@
         <option value="$PROJECT_DIR$/log/__init__.py" />
         <option value="$PROJECT_DIR$/log/log.py" />
         <option value="$PROJECT_DIR$/cartons/__init__.py" />
-        <option value="$PROJECT_DIR$/cartons/cartons.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
-        <option value="$PROJECT_DIR$/totes/totes.py" />
         <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
         <option value="$PROJECT_DIR$/__init___.py" />
+        <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/load_data.py" />
+        <option value="$PROJECT_DIR$/cartons/cartons.py" />
+        <option value="$PROJECT_DIR$/totes/totes.py" />
         <option value="$PROJECT_DIR$/putwall/putwall.py" />
         <option value="$PROJECT_DIR$/orders/orders.py" />
-        <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/run_model.py" />
       </list>
     </option>
@@ -209,6 +238,11 @@
             <path>
               <item name="PutWallOptimization" type="b2602c69:ProjectViewProjectNode" />
               <item name="PutWallOptimization" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PutWallOptimization" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PutWallOptimization" type="462c0819:PsiDirectoryNode" />
+              <item name="totes" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -333,7 +367,14 @@
       <option name="project" value="LOCAL" />
       <updated>1535601713596</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Finalized initialization">
+      <created>1535604771930</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1535604771930</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TodoView">
@@ -349,9 +390,9 @@
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" weight="0.14754099" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.14754099" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
-      <window_info active="true" id="Debug" order="3" visible="true" weight="0.34637758" />
+      <window_info id="Debug" order="3" weight="0.34637758" />
       <window_info id="Run" order="4" weight="0.34267583" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.3295583" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
@@ -399,7 +440,8 @@
     <MESSAGE value="Cleaned up data loading, moved logging to utilities" />
     <MESSAGE value="Initialize put_walls" />
     <MESSAGE value="Initialize cartons" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initialize cartons" />
+    <MESSAGE value="Finalized initialization" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finalized initialization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -411,18 +453,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/putwall/putwall.py</url>
-          <line>65</line>
+          <line>55</line>
           <option name="timeStamp" value="175" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/run_model.py</url>
-          <line>102</line>
-          <option name="timeStamp" value="181" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/run_model.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="182" />
+          <url>file://$PROJECT_DIR$/totes/totes.py</url>
+          <line>3</line>
+          <option name="timeStamp" value="185" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -439,11 +476,47 @@
         <watch expression="totes_df[(totes_df['unit_count'] &gt; 0) &amp; (totes_df.index &gt;= tote_count)]" language="Python" />
         <watch expression="len(new_totes)" language="Python" />
         <watch expression="len(totes_df)" language="Python" />
+        <watch expression="item_master_df.loc[sku_list]" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>item_master_df.loc[sku_list]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>item_master_df[sku_list]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>inventory_df[sku_list]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>inventory_df.index.name</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>inventory_df['sku']</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>inventory_df.sku</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>totes_df['tote_id'] = totes_df.index</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>len(totes_df)</expression-string>
         <language-id>Python</language-id>
@@ -456,41 +529,6 @@
       </expression>
       <expression>
         <expression-string>totes_df[(totes_df['unit_count'] &gt; 0) &amp; (totes_df.index &gt;= tote_count)]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>totes_df[(totes_df['unit_count'] &gt; 0)]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>row</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>row['units']</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>order_data[order_data.index.map(lambda x: x[1] == 'AB71068259_f')]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>order_data[order_data.index.map(lambda x: x[1] = 'AB71068259_f')]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>order_data[order_data.index.map(lambda x: x[1] = 'AB71068259_f']</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>order_data[order_data.index.map(lambda x: x[1] = 'AB71068259_f')]]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -539,6 +577,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="63">
           <caret line="3" column="26" selection-start-line="3" selection-start-column="26" selection-end-line="3" selection-end-column="26" />
+          <folding>
+            <marker date="1534451178073" expanded="true" signature="10:15" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -615,63 +656,19 @@
     <entry file="file://$PROJECT_DIR$/__init___.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/totes/totes.py">
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="14" column="106" selection-start-line="14" selection-start-column="106" selection-end-line="14" selection-end-column="106" />
-          <folding>
-            <marker date="1535388590140" expanded="true" signature="11:16" ph="..." />
-            <marker date="1535388590140" expanded="true" signature="1269:1369" ph="..." />
-            <marker date="1535388590140" expanded="true" signature="1543:1548" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2310">
-          <caret line="110" column="22" selection-start-line="110" selection-start-column="22" selection-end-line="110" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/orders/orders.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="32" selection-start-column="32" selection-end-column="32" />
-          <folding>
-            <marker date="1535600508200" expanded="true" signature="45:50" ph="..." />
-            <marker date="1535600508200" expanded="true" signature="355:360" ph="..." />
-          </folding>
+        <state relative-caret-position="193">
+          <caret line="308" selection-start-line="308" selection-end-line="308" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2310">
+        <state relative-caret-position="1806">
           <caret line="134" selection-start-line="134" selection-end-line="134" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
-          <caret line="4" column="33" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/load_data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-            <marker date="1535576600202" expanded="true" signature="171:172" ph="..." />
           </folding>
         </state>
       </provider>
@@ -683,17 +680,69 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/codecs.py">
+    <entry file="file://$PROJECT_DIR$/load_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="308" selection-start-line="308" selection-end-line="308" />
+        <state relative-caret-position="357">
+          <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="66" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+            <marker date="1535633726057" expanded="true" signature="172:173" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/totes/totes_old.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="14" column="106" selection-start-line="14" selection-start-column="106" selection-end-line="14" selection-end-column="106" />
+          <folding>
+            <marker date="1535388590140" expanded="true" signature="11:16" ph="..." />
+            <marker date="1535388590140" expanded="true" signature="1269:1369" ph="..." />
+            <marker date="1535388590140" expanded="true" signature="1543:1548" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="8" lean-forward="true" selection-end-line="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/totes/totes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="63">
+          <caret line="3" column="22" lean-forward="true" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="630">
+          <caret line="50" column="139" selection-start-line="50" selection-start-column="139" selection-end-line="50" selection-end-column="139" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/orders/orders.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="636">
+          <caret line="33" column="27" lean-forward="true" selection-start-line="33" selection-start-column="27" selection-end-line="33" selection-end-column="27" />
+          <folding>
+            <marker date="1535637794637" expanded="true" signature="45:50" ph="..." />
+            <marker date="1535637794637" expanded="true" signature="355:360" ph="..." />
+            <marker date="1535637794637" expanded="true" signature="549:554" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="303">
-          <caret line="94" selection-start-line="94" selection-end-line="94" />
+        <state relative-caret-position="447">
+          <caret line="116" column="62" lean-forward="true" selection-start-line="116" selection-start-column="62" selection-end-line="116" selection-end-column="62" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
           </folding>

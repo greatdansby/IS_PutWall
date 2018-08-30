@@ -1,14 +1,13 @@
 from putwall.putwall import PutWall, PutSlot
-from cartons.cartons import Carton
-from skus.skus import SKU
-from orders.orders import Order, Line
+from totes.totes import Tote
+from orders.orders import Order_Handler
 from logic.putwalloptimization import assign_store, assign_carton, get_top_stores, pass_to_pw
 import sqlalchemy as sa
 import pandas as pd
 import numpy as np
 import time, csv, argparse
 from utilities import print_timer
-from load_data import load_from_db
+from load_data import load_from_db, split_inv_to_tote
 
 # create engine for quering using sqlalchemy
 engine = sa.create_engine('mssql+pyodbc://sa:FT123!@#@lab-sqlserver3.invata.com\SQL2014/Burlington?driver=SQL+Server+Native+Client+11.0')
@@ -40,11 +39,12 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                              load_from_db=initialize,
                              data_filename='data.h5',
                              index=['store', 'sku'])
+    order_handler = Order_Handler(orders_df)
 
 # Initialize put walls
     put_walls = {}
     for pw in range(num_putwalls):
-        put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall)
+        put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall, debug=debug)
         for ps in range(num_slot_per_wall):
             put_walls[pw].add_slot(PutSlot(id=ps))
 
@@ -80,28 +80,15 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                                  data_filename='data.h5',
                                  index=['sku'])
 
-    item_master_df = inventory_df.loc[:, ~inventory_df.columns.isin(['Lines', 'Units'])].copy()
-    sku_list = np.random.choice(item_master_df.sku, size=int(len(item_master_df)*.6))
-    item_master_df['active'] = item_master_df.sku.isin(sku_list)
-    inventory_df['active'] = item_master_df.sku.isin(sku_list)
+    item_master_df = inventory_df.loc[:, ~inventory_df.columns.isin(['lines', 'units'])].copy()
+    sku_list = np.random.choice(item_master_df.index, size=int(len(item_master_df)*.6))
+    item_master_df['active'] = item_master_df.index.isin(sku_list)
+    inventory_df['active'] = item_master_df.index.isin(sku_list)
 
     start = print_timer(debug, start, 'Initialized item master & inventory')
 
 # Split inventory into full totes
-    tote_count = 0
-    totes_df = inventory_df.copy()
-    totes_df['unit_count'] = totes_df.units - totes_df.unitspercase
-    while True:
-        new_totes = totes_df[(totes_df['unit_count'] > 0) & (totes_df.index >= tote_count)]
-        if len(new_totes) == 0:
-            break
-        tote_count = len(totes_df)
-        totes_df = totes_df.append(new_totes, ignore_index=True)
-        totes_df['unit_count'] = totes_df.unit_count - totes_df.unitspercase
-    #TODO fix columns
-
-    start = print_timer(debug, start, 'Initialized totes')
-
+    totes_df = split_inv_to_tote(inventory_df, sku_list)
 
 # Track stats
     loop_time = time.time()
@@ -111,17 +98,37 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
     output = []
     open_lines = []
     passes = 0
-    while order_data['units'].sum() > 0:
-        if sum(order_data[order_data['units'] > 0].units) == sum(open_lines):
-            print('Nothing left')
-        print('Loop: {}\nCarton Pulls: {}'.format(loop, count_carton_pulls))
-        open_lines = list(order_data[order_data['units'] > 0].units)
-        print('Open Lines: {}'.format(len(open_lines)))
-        print('Open Units: {}'.format(sum(open_lines)))
-        print('Active Units: {}'.format(carton_data[carton_data['active'] == True]['quantity'].sum()))
 
+    while order_data['units'].sum() > 0:
+
+        print('Open Units: {}'.format(order_data['units'].sum()))
         loop_time = print_timer(True, loop_time, 'Loop Start')
         loop += 1
+
+# Process each put_wall in order one at a time
+        for pw in put_walls.values():
+
+# Process totes
+            assign_stores(debug=debug, pw=pw, orders_df=orders_df)
+
+            tote_id, log = pw.fill_from_queue(num_to_process=, loop=loop, order_handler=order_handler)
+            output.extend(log)
+
+            if tote_id: #If carton didn't pick clean, pass it.
+                if pass_to_pw(debug=debug, tote_id, put_walls, orders_df): passes += 1
+
+            carton_id = assign_carton(debug=debug, pw=pw, carton_data=carton_data, cartons=cartons)
+
+            if carton_id is None and loop > 1:
+# Release more SKUs
+                inactive_skus = item_master_df.loc[item_master_df.active == False].index
+                if inactive_skus:
+                    sku_list = np.random.choice(inactive_skus, size=100) #TODO remove hardcoding
+                    item_master_df.loc[sku_list].active = True
+                    totes_df = totes_df.append(split_inv_to_tote(inventory_df, sku_list), ignore_index=True)
+
+                start = print_timer(debug, start, 'Release more SKUs')
+
         for pw in put_walls.values():
             log = pw.fill_from_queue(1, loop)
             if log:

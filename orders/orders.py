@@ -18,3 +18,23 @@ class Line:
         self.quantity = quantity
         self.UOM = UOM
         self.status = status
+
+class Order_Handler:
+    def __init__(self, orders_df):
+        self.orders_df = orders_df
+
+    def deplete_inv(self, order, sku, quantity):
+        current_inv = self.orders_df.at[(order, sku)]
+        if current_inv > quantity:
+            current_inv -= quantity
+        elif current_inv == quantity:
+            return self.close_line(order=order, sku=sku)
+        else:
+            print('Error: Cannot create negative inventory')
+            raise Exception
+
+    def close_line(self, order, sku):
+        self.orders_df.at[(order, sku)].units = 0
+        self.orders_df.at[(order, sku)].active = False
+        if self.orders_df[order].units.sum() == 0: return True
+        return False # Return False if order still open, True if closed
