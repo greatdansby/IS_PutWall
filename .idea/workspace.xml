@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8d119f53-98c0-482a-8303-34259e0376ae" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/load_data.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utilities.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/orders/orders.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/orders.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/putwall/putwall.py" beforeDir="false" afterPath="$PROJECT_DIR$/putwall/putwall.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_model.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,14 +36,14 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="17" />
-          <entry key="py" value="25352" />
-          <entry key="txt" value="236" />
+          <entry key="py" value="25581" />
+          <entry key="txt" value="288" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="236" />
-          <entry key="Python" value="25369" />
+          <entry key="PLAIN_TEXT" value="288" />
+          <entry key="Python" value="25598" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages">
@@ -59,24 +59,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-504">
-              <caret line="34" column="7" selection-start-line="34" selection-start-column="7" selection-end-line="34" selection-end-column="7" />
+            <state relative-caret-position="2310">
+              <caret line="110" column="22" selection-start-line="110" selection-start-column="22" selection-end-line="110" selection-end-column="22" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/totes/totes.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="14" column="106" selection-start-line="14" selection-start-column="106" selection-end-line="14" selection-end-column="106" />
-              <folding>
-                <marker date="1535388590140" expanded="true" signature="11:16" ph="..." />
-                <marker date="1535388590140" expanded="true" signature="1269:1369" ph="..." />
-                <marker date="1535388590140" expanded="true" signature="1543:1548" ph="..." />
               </folding>
             </state>
           </provider>
@@ -86,10 +72,10 @@
         <entry file="file://$PROJECT_DIR$/orders/orders.py">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="12" selection-start-column="12" selection-end-column="12" />
+              <caret column="32" selection-start-column="32" selection-end-column="32" />
               <folding>
-                <marker date="1534779499079" expanded="true" signature="12:17" ph="..." />
-                <marker date="1534779499079" expanded="true" signature="301:306" ph="..." />
+                <marker date="1535600508200" expanded="true" signature="45:50" ph="..." />
+                <marker date="1535600508200" expanded="true" signature="355:360" ph="..." />
               </folding>
             </state>
           </provider>
@@ -98,7 +84,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="657">
+            <state relative-caret-position="2310">
               <caret line="134" selection-start-line="134" selection-end-line="134" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -110,17 +96,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="21">
-              <caret line="1" column="81" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="81" />
+            <state relative-caret-position="84">
+              <caret line="4" column="33" lean-forward="true" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="924">
-              <caret line="44" column="22" selection-start-line="44" selection-start-column="22" selection-end-line="44" selection-end-column="22" />
+            <state relative-caret-position="441">
+              <caret line="43" column="22" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -128,7 +114,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/load_data.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="252">
@@ -180,17 +166,17 @@
         <option value="$PROJECT_DIR$/logic/__init__.py" />
         <option value="$PROJECT_DIR$/log/__init__.py" />
         <option value="$PROJECT_DIR$/log/log.py" />
-        <option value="$PROJECT_DIR$/orders/orders.py" />
         <option value="$PROJECT_DIR$/cartons/__init__.py" />
         <option value="$PROJECT_DIR$/cartons/cartons.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/totes/totes.py" />
-        <option value="$PROJECT_DIR$/putwall/putwall.py" />
         <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
         <option value="$PROJECT_DIR$/__init___.py" />
         <option value="$PROJECT_DIR$/utilities.py" />
-        <option value="$PROJECT_DIR$/run_model.py" />
         <option value="$PROJECT_DIR$/load_data.py" />
+        <option value="$PROJECT_DIR$/putwall/putwall.py" />
+        <option value="$PROJECT_DIR$/orders/orders.py" />
+        <option value="$PROJECT_DIR$/run_model.py" />
       </list>
     </option>
   </component>
@@ -318,7 +304,14 @@
       <option name="project" value="LOCAL" />
       <updated>1535573979991</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Cleaned up data loading, moved logging to utilities">
+      <created>1535576626172</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1535576626172</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TodoView">
@@ -332,7 +325,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
       <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.14754099" />
@@ -382,7 +374,8 @@
     <MESSAGE value="Tried using a single large matrix for all SKUs/Locations. Method took longer than original. Back to the drawing board." />
     <MESSAGE value="Fixed carton depletion bug." />
     <MESSAGE value="Fixed passing logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed passing logic" />
+    <MESSAGE value="Cleaned up data loading, moved logging to utilities" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaned up data loading, moved logging to utilities" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -394,7 +387,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/putwall/putwall.py</url>
-          <line>62</line>
+          <line>65</line>
           <option name="timeStamp" value="175" />
         </line-breakpoint>
       </breakpoints>
@@ -576,17 +569,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/orders/orders.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="12" selection-start-column="12" selection-end-column="12" />
-          <folding>
-            <marker date="1534779499079" expanded="true" signature="12:17" ph="..." />
-            <marker date="1534779499079" expanded="true" signature="301:306" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/inventory/inventory.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="399">
@@ -594,6 +576,34 @@
           <folding>
             <marker date="1534448850298" expanded="true" signature="16:21" ph="..." />
             <marker date="1534448850298" expanded="true" signature="85:90" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/pandas/core/indexing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="2222" selection-start-line="2222" selection-end-line="2222" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/__init___.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/load_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="12" column="26" lean-forward="true" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+            <marker date="1535576600202" expanded="true" signature="171:172" ph="..." />
           </folding>
         </state>
       </provider>
@@ -610,16 +620,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/pandas/core/indexing.py">
+    <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="2222" selection-start-line="2222" selection-end-line="2222" />
+        <state relative-caret-position="2310">
+          <caret line="110" column="22" selection-start-line="110" selection-start-column="22" selection-end-line="110" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/orders/orders.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="32" selection-start-column="32" selection-end-column="32" />
+          <folding>
+            <marker date="1535600508200" expanded="true" signature="45:50" ph="..." />
+            <marker date="1535600508200" expanded="true" signature="355:360" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="657">
+        <state relative-caret-position="2310">
           <caret line="134" selection-start-line="134" selection-end-line="134" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -627,50 +651,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-504">
-          <caret line="34" column="7" selection-start-line="34" selection-start-column="7" selection-end-line="34" selection-end-column="7" />
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cartons/cartons.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="21">
-          <caret line="1" column="81" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="81" />
+        <state relative-caret-position="84">
+          <caret line="4" column="33" lean-forward="true" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/__init___.py">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/run_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="924">
-          <caret line="44" column="22" selection-start-line="44" selection-start-column="22" selection-end-line="44" selection-end-column="22" />
+        <state relative-caret-position="441">
+          <caret line="43" column="22" selection-start-line="43" selection-start-column="22" selection-end-line="43" selection-end-column="22" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/load_data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="12" column="26" lean-forward="true" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-            <marker date="1535576600202" expanded="true" signature="171:172" ph="..." />
           </folding>
         </state>
       </provider>

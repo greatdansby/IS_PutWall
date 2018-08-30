@@ -1,6 +1,8 @@
 from cartons.cartons import Carton
 from totes.totes import Tote
 
+#TODO Add putwall_manager (future)
+
 class PutWall:
     def __init__(self, num_slots, id, queue_length=1, facings=1):
         self.num_slots = num_slots
@@ -59,6 +61,7 @@ class PutWall:
                                 'order': slot.order,
                                 'putwall': self.id,
                                 'loop': loop})
+            #TODO Close slot, close order, return carton
         if log == []:
             print('No fulfillment')
         return log
@@ -75,6 +78,7 @@ class PutWall:
         return [slot for slot in self.slots.values() if slot.get_allocation(sku=sku) > 0]
 
     def get_allocation(self):
+        #TODO refactor
         allocation = {}
         for slot in [s for s in self.slots.values() if s.active]:
             for line in slot.alloc_lines:
@@ -104,17 +108,20 @@ class PutSlot:
         return False
 
     def clear(self):
+        #TODO refactor
         self.order = None
         self.alloc_lines = None
         self.active = False
         self.quantity = 0
 
     def get_allocation(self, sku):
+        #TODO refactor
         if self.alloc_lines:
             return sum([l.quantity for l in self.alloc_lines if l.sku == sku])
         return 0
 
     def update_quantity(self, qty):
+        #TODO refactor
         if self.quantity + qty <= self.capacity:
             self.quantity += qty
         else:
@@ -122,6 +129,7 @@ class PutSlot:
             raise Exception
 
     def update_allocation(self, sku, qty):
+        #TODO refactor
         for line in [l for l in self.alloc_lines if l.sku == sku]:
             if line.quantity + qty >= 0:
                 line.quantity += qty
@@ -131,6 +139,7 @@ class PutSlot:
                 raise Exception
 
     def assign(self, order, alloc_lines):
+        #TODO remove
         if order and alloc_lines:
             self.order = order
             self.alloc_lines = alloc_lines

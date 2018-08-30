@@ -42,23 +42,11 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                              index=['store,sku'])
 
 # Initialize put walls
-#TODO init put-wall df
-
     put_walls = {}
-    top_stores = get_top_stores(orders, sort='Lines')
     for pw in range(num_putwalls):
         put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall)
         for ps in range(num_slot_per_wall):
-            if top_stores:
-                order_id = top_stores.pop(0)
-                orders[order_id].allocated = True
-                put_walls[pw].add_slot(PutSlot(id=ps,
-                                               capacity=np.random.randint(25, 35),
-                                               order=order_id,
-                                               active=True,
-                                               alloc_lines=orders[order_id].lines))
-            else:
-                put_walls[pw].add_slot(PutSlot(id=ps, capacity=np.random.randint(25, 35)))
+            put_walls[pw].add_slot(PutSlot(id=ps))
 
     start = print_timer(debug, start, 'Initialized put-walls')
 
