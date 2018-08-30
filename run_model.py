@@ -19,7 +19,7 @@ ItemMaster_table = 'dbo.tblItemMaster'
 def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0501to0511',
               date='5/11/2017', output_file='output.csv'):
 # Setup
-    debug = False
+    debug = True
     initialize = False
     np.random.seed(32)
     start = time.time()
@@ -39,7 +39,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                              data_name='orders_df',
                              load_from_db=initialize,
                              data_filename='data.h5',
-                             index=['store,sku'])
+                             index=['store', 'sku'])
 
 # Initialize put walls
     put_walls = {}
@@ -52,8 +52,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 
 # Initialize item_master & inventory
     sql = '''select sku,
-            Sum(UnitQty_Future) AS Units,
-            count(sku) AS Lines,
+            Sum(UnitQty_Future) AS units,
+            count(sku) AS lines,
             ISNULL(COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase),21) AS unitspercase
             From {} OO
             OUTER APPLY (
@@ -81,24 +81,24 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                                  index=['sku'])
 
     item_master_df = inventory_df.loc[:, ~inventory_df.columns.isin(['Lines', 'Units'])].copy()
-    sku_list = np.random.choice(item_master_df.sku, size=int(item_master_df.count()*.6))
+    sku_list = np.random.choice(item_master_df.sku, size=int(len(item_master_df)*.6))
     item_master_df['active'] = item_master_df.sku.isin(sku_list)
+    inventory_df['active'] = item_master_df.sku.isin(sku_list)
 
     start = print_timer(debug, start, 'Initialized item master & inventory')
 
-# Intialize totes
-    totes_df = pd.DataFrame(index=None, columns=['tote_id', 'sku', 'quantity', 'active', 'allocated', 'location'],
-                             dtype=int)
-    units = inventory_df.values
-    tote_id = 0
-
-    # Split inventory into full totes
-    for row in inventory_df.iterrows():
-        units = row.units
-        while units > 0:
-            totes_df.loc[len(totes_df)] = [tote_id, row.sku, row.unitspercase, row.active, False, 'Buffer']
-            units -= row.unitspercase
-            tote_id += 1
+# Split inventory into full totes
+    tote_count = 0
+    totes_df = inventory_df.copy()
+    totes_df['unit_count'] = totes_df.units - totes_df.unitspercase
+    while True:
+        new_totes = totes_df[(totes_df['unit_count'] > 0) & (totes_df.index >= tote_count)]
+        if len(new_totes) == 0:
+            break
+        tote_count = len(totes_df)
+        totes_df = totes_df.append(new_totes, ignore_index=True)
+        totes_df['unit_count'] = totes_df.unit_count - totes_df.unitspercase
+    #TODO fix columns
 
     start = print_timer(debug, start, 'Initialized totes')
 

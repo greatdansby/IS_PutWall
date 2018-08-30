@@ -1,3 +1,5 @@
+import time
+
 def print_timer(debug, start, label=''):
     buffer = '-'*max(30-len(label), 0)
     if debug:
