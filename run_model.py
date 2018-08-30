@@ -50,8 +50,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 
     start = print_timer(debug, start, 'Initialized put-walls')
 
-# Initialize item_master
-
+# Initialize item_master & inventory
     sql = '''select sku,
             Sum(UnitQty_Future) AS Units,
             count(sku) AS Lines,
@@ -81,43 +80,31 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                                  data_filename='data.h5',
                                  index=['sku'])
 
-    item_master = {i: SKU(id=i) for i in inventory_df.index}
-    # Order sku_list by demand ascending
-    order_array = pd.DataFrame([[l.sku, l.quantity] for o in orders.values() for l in o.lines])
-    sku_demand = order_array.groupby(0).sum()
-    sku_list = sku_demand.index
-    active_skus = np.random.choice(sku_list, size=int(len(sku_list)*.6))
-    for sku in active_skus:
-        item_master[sku].active = False
+    item_master_df = inventory_df.loc[:, ~inventory_df.columns.isin(['Lines', 'Units'])].copy()
+    sku_list = np.random.choice(item_master_df.sku, size=int(item_master_df.count()*.6))
+    item_master_df['active'] = item_master_df.sku.isin(sku_list)
 
-    start = print_timer(debug, start, 'Initialized item master')
+    start = print_timer(debug, start, 'Initialized item master & inventory')
 
-# Intialize cartons
-#TODO init carton df
-    cartons = {}
-    units = inventory_df
-    carton_id = 0
-    carton_data = []
-    for sku in sku_list:
-        while units.loc[sku, 'Units'] > 0:
-            units_per_case = units.loc[sku, 'unitspercase']
-            if units_per_case == 0:
-                units_per_case = units.loc[sku, 'Units']
-            cartons[carton_id] = Carton(carton_id, active=item_master[sku].active, sku=sku, quantity=units_per_case)
-            carton_data.append({'id':carton_id,
-                                'active': item_master[sku].active,
-                                'sku': sku,
-                                'quantity': units_per_case,
-                                'allocated': False})
-            units.loc[sku, 'Units'] -= min(units_per_case, units.loc[sku, 'Units'])
-            carton_id += 1
-    carton_data = pd.DataFrame(carton_data)
-    carton_data = carton_data.set_index('id')
-    print('{} Cartons created.'.format(len(cartons)))
+# Intialize totes
+    totes_df = pd.DataFrame(index=None, columns=['tote_id', 'sku', 'quantity', 'active', 'allocated', 'location'],
+                             dtype=int)
+    units = inventory_df.values
+    tote_id = 0
 
-    start = print_timer(debug, start, 'Initialized Totes')
+    # Split inventory into full totes
+    for row in inventory_df.iterrows():
+        units = row.units
+        while units > 0:
+            totes_df.loc[len(totes_df)] = [tote_id, row.sku, row.unitspercase, row.active, False, 'Buffer']
+            units -= row.unitspercase
+            tote_id += 1
+
+    start = print_timer(debug, start, 'Initialized totes')
+
+
+# Track stats
     loop_time = time.time()
-
     count_carton_pulls = 0
     units_shipped = 0
     loop = 0
