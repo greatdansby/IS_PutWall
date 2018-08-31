@@ -31,4 +31,6 @@ def split_inv_to_tote(inventory_df, sku_list):
         totes_df = totes_df.append(new_totes, ignore_index=True)
         totes_df['unit_count'] = totes_df.unit_count - totes_df.unitspercase
     totes_df['units'] = totes_df.unitspercase
-    return totes_df.loc[:, totes_df.columns.isin(['units', 'sku'])]
+    totes_df['active'] = True
+    totes_df['allocated'] = False
+    return totes_df.loc[:, totes_df.columns.isin(['units', 'sku', 'active', 'allocated'])]

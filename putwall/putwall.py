@@ -1,17 +1,19 @@
-from cartons.cartons import Carton
+from totes.totes import Tote
 from utilities import print_timer
+import pandas as pd
 import time
 
 #TODO Add putwall_manager (future)
 
 class PutWall:
-    def __init__(self, num_slots, id, queue_length=5, debug=False):
+    def __init__(self, num_slots, id, queue_length=5, debug=False, orders_df=None):
         self.num_slots = num_slots
         self.id = id
         self.slots = {}
         self.queue = []
         self.queue_length = queue_length
         self.debug = debug
+        self.orders_df = orders_df
 
     def add_slot(self, putslot):
         self.slots[putslot.id] = putslot
@@ -36,7 +38,7 @@ class PutWall:
             if type(obj) == Tote:
                 tote = obj
                 for slot in self.find_slots(sku=tote.sku):
-                    qty_allocated = slot.get_allocation(sku=tote.sku)
+                    qty_allocated = self.orders_df.at[(slot.order, tote.sku), 'units']
                     qty_remaining = tote.quantity
                     qty_available = slot.capacity - slot.quantity
                     qty_moved = min(qty_allocated, qty_remaining, qty_available)
@@ -65,7 +67,18 @@ class PutWall:
         return [slot for slot in self.slots.values() if slot.is_clear()]
 
     def find_slots(self, sku=None):
-        return [slot for slot in self.slots.values() if slot.get_allocation(sku=sku) > 0]
+        order_list = [(slot.order, sku) for slot in self.slots.values() if slot.order is not None]
+        if order_list:
+            filtered_order_list = self.orders_df.loc[self.orders_df.index.isin(order_list) &
+                                                     self.orders_df['units'] > 0].index.get_level_values(0)
+            return [slot for slot in self.slots.values() if slot.order in filtered_order_list]
+        return pd.DataFrame()
+
+    def get_allocation(self):
+        order_list = [slot.order for slot in self.slots.values() if slot.order is not None]
+        if order_list:
+            return self.orders_df.loc[order_list].groupby('sku').sum()
+        return pd.DataFrame()
 
 
 class PutSlot:
@@ -77,7 +90,7 @@ class PutSlot:
         self.order = order
 
     def is_clear(self, clear_func=None):
-        return self.active and self.order is None
+        return not self.active and self.order is None
 
     def clear(self):
         #TODO refactor

@@ -20,7 +20,13 @@ def assign_stores(debug, pw, orders_df):
     # Get a list of stores with the best affinity to the current put-wall
     top_stores = get_store_affinity(debug=debug, pw=pw, orders_df=orders_df)
 
-    if top_stores:
+    if len(top_stores) > 0:
+        for n, slot in enumerate(pw.empty_slots()):
+            slot.order = top_stores[n]
+            slot.active = True
+            slot.capacity = np.random.randint(25, 35)
+    else:
+        order_list = orders_df.groupby('store').sum()
         for n, slot in enumerate(pw.empty_slots()):
             slot.order = top_stores[n]
 
@@ -38,32 +44,42 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
     :return:
     '''
     start = time.time()
+    totes_assigned = []
 
     for i in range(min(num_to_assign, pw.queue_length-len(pw.queue))):
         stores_in_pw = [s.order for s in pw.slots.values()]
         start = print_timer(debug, start, 'Store in PW')
 
-        skus_alloc_to_pw = orders_df.loc[stores_in_pw].groupby('sku').sum()
+        skus_alloc_to_pw = pw.get_allocation()
         start = print_timer(debug, start, 'Get Allocation')
+
+        if skus_alloc_to_pw.empty:
+            idx = totes_df.loc[(totes_df['active'] == True) & (totes_df['allocated'] == False)].first_valid_index()
+            pw.add_to_queue(Tote(id=idx, totes_df=totes_df, allocated=True))
+            totes_assigned.append(idx)
+            continue
 
         totes_not_in_queue = totes_df.loc[(totes_df['active'] == True) &
                                           (totes_df['allocated'] == False) &
-                                          (totes_df['sku'].isin(skus_alloc_to_pw.sku))]
+                                          (totes_df['sku'].isin(skus_alloc_to_pw.index))]
         start = print_timer(debug, start, 'Get cartons')
 
-        avail_cartons = totes_not_in_queue.loc[totes_not_in_queue['quantity'].isin(skus_alloc_to_pw.units)]
+        avail_cartons = totes_not_in_queue.loc[totes_not_in_queue['units'].isin(skus_alloc_to_pw.units)]
         start = print_timer(debug, start, 'Avail cartons')
 
         if not avail_cartons.empty:
             idx = avail_cartons.first_valid_index()
             start = print_timer(debug, start, 'Get index')
             pw.add_to_queue(Tote(id=idx, totes_df=totes_df, allocated=True))
+            totes_assigned.append(idx)
         elif not totes_not_in_queue.empty:
             idx = totes_not_in_queue.sort_values(by='quantity', ascending=False).first_valid_index()
             start = print_timer(debug, start, 'Get index no clean picks')
             pw.add_to_queue(Tote(id=idx, totes_df=totes_df, allocated=True))
-    print('No cartons found for  assignment')
-    return None
+            totes_assigned.append(idx)
+    if not totes_assigned:
+        print('No cartons found for  assignment')
+    return totes_assigned
 
 
 def get_top_stores(orders, sort='Lines', num=999999):
@@ -124,7 +140,7 @@ def get_store_affinity(debug, pw, orders_df):
     top_stores = list(order_demand.sort_values('units', ascending=False).index)
     start = print_timer(debug, start, 'Store sort')
 
-    if not top_stores: return stores_avail_for_alloc
+    if not top_stores: return orders_df[stores_avail_for_alloc].index.get_level_values(0).unique()
     return top_stores
 
 def pass_to_pw(debug, tote, put_walls, orders_df, pw_id):
@@ -132,8 +148,8 @@ def pass_to_pw(debug, tote, put_walls, orders_df, pw_id):
                       for k in put_walls.keys() if k != pw_id], key=lambda k: k[1])
     for pw, _ in pw_list[:18]:
         alloc = put_walls[pw].get_allocation()
-        if carton.sku in alloc:
-            if alloc[carton.sku] >= carton.quantity:
-                put_walls[pw].add_to_queue(carton)
+        if tote.sku in alloc:
+            if alloc[tote.sku] >= tote.quantity:
+                put_walls[pw].add_to_queue(tote)
                 return True
     return False
