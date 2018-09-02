@@ -15,11 +15,12 @@ receiving_table = 'tblReceiving'
 ItemMaster_table = 'dbo.tblItemMaster'
 
 
-def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0501to0511',
-              date='5/11/2017', output_file='output.csv'):
+def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_New',
+              date='01/23/2017', output_file='output.csv'):
+    #Max day 5/11/2017 @ dbo.Burlington0501to0511
 # Setup
-    debug = True
-    initialize = True
+    debug = False
+    initialize = False
     np.random.seed(32)
     start = time.time()
 
@@ -27,10 +28,17 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
     sql = '''select ShipTo as store,
                             sku,
                             UnitQty_Future as units,
-                            0 as allocated
+                            0 as alloc_qty
                             From {}
                             Where ShipDate = '{}'
                            Order by ShipTo, SKU'''.format(order_table, date)
+    sql = '''select ShipTo as store,
+                    Sum(UnitQty) as units,
+                    0 as alloc_qty,
+                    sku
+                    From {}
+                    Where ShipDate = '{}'
+                    Group by ShipTo, sku'''.format(order_table, date)
 
     orders_df = load_from_db(debug=debug,
                              engine=engine,
@@ -40,15 +48,6 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
                              data_filename='data.h5',
                              index=['store', 'sku'])
     order_handler = Order_Handler(orders_df)
-
-# Initialize put walls
-    put_walls = {}
-    for pw in range(num_putwalls):
-        put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall, debug=debug, queue_length=5, orders_df=orders_df)
-        for ps in range(num_slot_per_wall):
-            put_walls[pw].add_slot(PutSlot(id=ps))
-
-    start = print_timer(debug, start, 'Initialized put-walls')
 
 # Initialize item_master & inventory
     sql = '''select sku,
@@ -90,6 +89,16 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
 # Split inventory into full totes
     totes_df = split_inv_to_tote(inventory_df, sku_list)
 
+# Initialize put walls
+    put_walls = {}
+    for pw in range(num_putwalls):
+        put_walls[pw] = PutWall(id=pw, num_slots=num_slot_per_wall, debug=debug, queue_length=5,
+                                orders_df=orders_df, totes_df=totes_df)
+        for ps in range(num_slot_per_wall):
+            put_walls[pw].add_slot(PutSlot(id=ps))
+
+    start = print_timer(debug, start, 'Initialized put-walls')
+
 # Track stats
     loop_time = time.time()
     tote_pulls = 0
@@ -97,30 +106,41 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Burlington0
     tote_passes = 0
     loop = 0
     output = []
+    initial_units = orders_df['units'].sum()
 
     while orders_df['units'].sum() > 0:
-
-        print('Open Units: {}'.format(orders_df['units'].sum()))
-        loop_time = print_timer(True, loop_time, 'Loop Start')
+        current_units = orders_df['units'].sum()
+        print('Open Units: {}'.format(current_units))
+        print('Picks per Tote: {}'.format((initial_units-current_units)/(tote_pulls-65*5)))
+        print('Tote Pulls: {}'.format(tote_pulls))
+        print('Tote Passes: {}'.format(tote_passes))
+        print('Tote Returns: {}'.format(tote_returns))
+        loop_time = print_timer(True, loop_time, 'Loop Start: {}'.format(loop))
         loop += 1
 
 # Process each put_wall in order one at a time
         for pw in put_walls.values():
 
 # Process totes
-            if loop > 1: assign_stores(debug=debug, pw=pw, orders_df=orders_df)
+            if loop > 1 and loop < 6:
+                assign_stores(debug=debug, pw=pw, orders_df=orders_df, totes_df=totes_df, stores_to_fill=1)
+            if loop >= 6:
+                assign_stores(debug=debug, pw=pw, orders_df=orders_df, totes_df=totes_df, stores_to_fill=6)
+
 
             if loop > 5:
                 tote, log = pw.fill_from_queue(num_to_process=1, loop=loop, order_handler=order_handler)
                 output.extend(log)
 
                 if tote: #If carton didn't pick clean, pass it.
-                    if pass_to_pw(debug=debug, tote=tote, put_walls=put_walls, orders_df=orders_df, pw_id=pw.id):
+                    if pass_to_pw(debug=debug, tote=tote, put_walls=put_walls, orders_df=orders_df,
+                                  pw_id=pw.id, totes_df=totes_df):
                         tote_passes += 1
                     else:
                         tote_returns += 1
 
-            carton_ids = assign_totes(debug=debug, pw=pw, totes_df=totes_df, num_to_assign=1, orders_df=orders_df)
+            carton_ids = assign_totes(debug=debug, pw=pw, totes_df=totes_df,
+                                      num_to_assign=1, orders_df=orders_df)
             tote_pulls += len(carton_ids)
 
             if carton_ids is None and loop > 1:

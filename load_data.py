@@ -9,7 +9,7 @@ def load_from_db(debug, engine, sql, data_name, load_from_db=True, data_filename
     if load_from_db:
         data = pd.read_sql_query(sql, engine)
         if index:
-            data = data.set_index(index)
+            data = data.groupby(index).sum()
         data_store[data_name] = data
         data_store.close()
     else:
@@ -33,4 +33,5 @@ def split_inv_to_tote(inventory_df, sku_list):
     totes_df['units'] = totes_df.unitspercase
     totes_df['active'] = True
     totes_df['allocated'] = False
-    return totes_df.loc[:, totes_df.columns.isin(['units', 'sku', 'active', 'allocated'])]
+    totes_df['alloc_qty'] = 0
+    return totes_df.loc[:, totes_df.columns.isin(['units', 'sku', 'active', 'allocated', 'alloc_qty'])]

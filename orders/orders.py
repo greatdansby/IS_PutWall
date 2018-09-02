@@ -26,7 +26,7 @@ class Order_Handler:
     def deplete_inv(self, order, sku, quantity):
         current_inv = self.orders_df.at[(order, sku), 'units']
         if current_inv > quantity:
-            current_inv -= quantity
+            self.orders_df.at[(order, sku), 'units'] -= quantity
         elif current_inv == quantity:
             return self.close_line(order=order, sku=sku)
         else:
@@ -36,5 +36,7 @@ class Order_Handler:
     def close_line(self, order, sku):
         self.orders_df.at[(order, sku), 'units'] = 0
         self.orders_df.at[(order, sku), 'active'] = False
-        if self.orders_df.loc[order].units.sum() == 0: return True
+        if self.orders_df.loc[order].units.sum() == 0:
+            print('Closing order {}'.format(order))
+            return True
         return False # Return False if order still open, True if closed

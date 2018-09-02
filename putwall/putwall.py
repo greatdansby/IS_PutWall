@@ -6,7 +6,7 @@ import time
 #TODO Add putwall_manager (future)
 
 class PutWall:
-    def __init__(self, num_slots, id, queue_length=5, debug=False, orders_df=None):
+    def __init__(self, num_slots, id, queue_length=5, debug=False, orders_df=None, totes_df=None):
         self.num_slots = num_slots
         self.id = id
         self.slots = {}
@@ -14,16 +14,43 @@ class PutWall:
         self.queue_length = queue_length
         self.debug = debug
         self.orders_df = orders_df
+        self.totes_df = totes_df
 
     def add_slot(self, putslot):
         self.slots[putslot.id] = putslot
 
     def add_to_queue(self, tote):
-        if tote:
-            self.queue.append(tote)
-            return True
-        print('Warning: No tote provided')
-        return False
+        self.queue.append(tote)
+
+    def allocate_queue_to_orders(self):
+        start = time.time()
+
+        order_ids = self.get_orders()
+        if order_ids:
+            self.orders_df.loc[self.orders_df.index.get_level_values(0).isin(order_ids), 'alloc_qty'] = 0
+            for tote in self.queue:
+                tote.alloc_qty = 0
+                for order_id in order_ids:
+                    if tote.quantity - tote.alloc_qty == 0:
+                        break
+                    if (order_id, tote.sku) in self.orders_df.index:
+                        order_alloc = self.orders_df.at[(order_id, tote.sku), 'alloc_qty']
+                        order_units = self.orders_df.at[(order_id, tote.sku), 'units']
+                        if order_units - order_alloc == 0:
+                            break
+                        alloc = min(tote.quantity - tote.alloc_qty, order_units - order_alloc)
+                        tote.alloc_qty += alloc
+                        order_alloc += alloc
+                        self.orders_df.at[(order_id, tote.sku), 'alloc_qty'] += alloc
+                self.totes_df.at[tote.id, 'alloc_qty'] = tote.alloc_qty
+
+        print_timer(self.debug, start, 'allocate_queue_to_orders')
+
+    def get_orders(self):
+        return [s.order for s in self.slots.values() if s.order is not None]
+
+    def get_totes(self):
+        return [t.id for t in self.queue]
 
     def fill_from_queue(self, num_to_process, loop, order_handler):
 
@@ -43,7 +70,9 @@ class PutWall:
                     qty_available = slot.capacity - slot.quantity
                     qty_moved = min(qty_allocated, qty_remaining, qty_available)
 
-                    if qty_moved == 0: print('Warning (fill_from_queue): 0 quantity moved.')
+                    if qty_moved == 0:
+                        print('Warning (fill_from_queue): 0 quantity moved.')
+                        break
                     log.append({'quantity': qty_moved,
                                 'sku': tote.sku,
                                 'carton_id': tote.id,
@@ -54,7 +83,12 @@ class PutWall:
                     slot.update_quantity(qty=qty_moved)
                     order_closed = order_handler.deplete_inv(order=slot.order, sku=tote.sku, quantity=qty_moved) #TODO not crazy about this
                     tote = tote.update_quantity(-qty_moved)
-                    if slot.capacity - slot.quantity == 0 or order_closed: slot.clear()
+                    if slot.capacity - slot.quantity == 0 or order_closed:
+                        print('Clearing slot: {}-{}'.format(self.id, slot.id))
+                        slot.clear()
+                    if tote.quantity == 0:
+                        print('Tote picked clean')
+                        break
 
         if log == []:
             print('No fulfillment')
@@ -70,7 +104,7 @@ class PutWall:
         order_list = [(slot.order, sku) for slot in self.slots.values() if slot.order is not None]
         if order_list:
             filtered_order_list = self.orders_df.loc[self.orders_df.index.isin(order_list) &
-                                                     self.orders_df['units'] > 0].index.get_level_values(0)
+                                                     (self.orders_df['units'] > 0)].index.get_level_values(0)
             return [slot for slot in self.slots.values() if slot.order in filtered_order_list]
         return pd.DataFrame()
 
@@ -95,7 +129,6 @@ class PutSlot:
     def clear(self):
         #TODO refactor
         self.order = None
-        self.alloc_lines = None
         self.active = False
         self.quantity = 0
 
@@ -127,5 +160,4 @@ class PutSlot:
         #TODO remove
         if order and alloc_lines:
             self.order = order
-            self.alloc_lines = alloc_lines
             self.active = True
