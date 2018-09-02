@@ -51,7 +51,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
 
 # Initialize item_master & inventory
     sql = '''select sku,
-            Sum(UnitQty_Future) AS units,
+            Sum(UnitQty) AS units,
             count(sku) AS lines,
             ISNULL(COALESCE(OB.MaxUnitsPerCase, OA.MaxUnitsPerCase),21) AS unitspercase
             From {} OO

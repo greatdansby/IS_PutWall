@@ -88,13 +88,13 @@ class PutWall:
                         slot.clear()
                     if tote.quantity == 0:
                         print('Tote picked clean')
+                        tote = None
                         break
 
         if log == []:
             print('No fulfillment')
 
         print_timer(self.debug, start, 'fill_from_queue')
-
         return tote, log
 
     def empty_slots(self):

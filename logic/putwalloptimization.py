@@ -177,7 +177,7 @@ def pass_to_pw(debug, tote, put_walls, orders_df, pw_id, totes_df):
         if tote.sku in alloc.index:
             if (alloc.at[tote.sku, 'units']-alloc.at[tote.sku, 'alloc_qty'])/tote.quantity > .25:
                 put_walls[pw].add_to_queue(tote)
-                allocate_tote_to_pw(totes_df, pw, orders_df, tote)
+                allocate_tote_to_pw(totes_df, put_walls[pw], orders_df, tote)
                 return True
     return False
 
