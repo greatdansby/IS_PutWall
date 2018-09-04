@@ -132,7 +132,8 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                 tote, log = pw.fill_from_queue(num_to_process=1, loop=loop, order_handler=order_handler)
                 output.extend(log)
 
-                if tote: #If carton didn't pick clean, pass it.
+                if tote: #If carton didn't pick clean, pass it or return it.
+                    totes_df.at[tote.id, 'allocated'] = False
                     if pass_to_pw(debug=debug, tote=tote, put_walls=put_walls, orders_df=orders_df,
                                   pw_id=pw.id, totes_df=totes_df):
                         tote_passes += 1
@@ -143,12 +144,12 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                                       num_to_assign=1, orders_df=orders_df)
             tote_pulls += len(carton_ids)
 
-            if carton_ids is None and loop > 1:
+            if not carton_ids and loop > 1:
 # Release more SKUs
                 inactive_skus = item_master_df.loc[item_master_df.active == False].index
-                if inactive_skus:
+                if len(inactive_skus) > 0:
                     sku_list = np.random.choice(inactive_skus, size=100) #TODO remove hardcoding
-                    item_master_df.loc[sku_list].active = True
+                    item_master_df.loc[sku_list, 'active'] = True
                     totes_df = totes_df.append(split_inv_to_tote(inventory_df, sku_list), ignore_index=True)
 
                 start = print_timer(debug, start, 'Release more SKUs')

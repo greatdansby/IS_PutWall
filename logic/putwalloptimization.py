@@ -18,7 +18,6 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
     '''
 
     # Get a list of stores with the best affinity to the current put-wall
-    pw.allocate_queue_to_orders()
     top_stores = [0]#get_store_affinity(debug=debug, pw=pw, orders_df=orders_df)
     tote_ids = [t.id for t in pw.queue]
     totes_in_queue = totes_df.iloc[tote_ids]
@@ -34,17 +33,21 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
     for n, slot in enumerate(pw.empty_slots()[:stores_to_fill]):
         if len(combined_df) > n:
             slot.order = combined_df.index[n]
+            slot.alloc_lines = {}
             slot.active = True
             slot.capacity = np.random.randint(25, 35)
             allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
         elif len(top_stores) > n:
             slot.order = top_stores[n]
+            slot.alloc_lines = {}
             slot.active = True
             slot.capacity = np.random.randint(25, 35)
             allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
         else:
             order_list = orders_df.groupby('store').sum()
             slot.order = order_list[n]
+            slot.alloc_lines = {}
+            slot.active = True
             allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
 
 def pick_clean(alloc, row):
@@ -61,11 +64,11 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
     '''
     start = time.time()
     totes_assigned = []
-    pw.allocate_queue_to_orders()
+    totes_needed = min(num_to_assign, pw.queue_length-len(pw.queue))
+    for i in range(totes_needed):
 
-    for i in range(min(num_to_assign, pw.queue_length-len(pw.queue))):
-
-        stores_in_pw = {s.order: s.capacity-s.quantity for s in pw.slots.values() if s.order is not None}
+        stores_in_pw = {s.order: s.capacity-s.alloc_qty-s.quantity for s in pw.slots.values()
+                        if s.order is not None if s.capacity-s.alloc_qty-s.quantity > 0}
 
         if not any(stores_in_pw):
             # sku_demand = orders_df.groupby('sku').sum()
@@ -95,7 +98,7 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
         pw_open_demand = (combined_df['units_y'] - combined_df['alloc_qty_y'])
         combined_df['score'] = 1 - abs(combined_df['units_x']-pw_open_demand)/combined_df['units_x'] + 1*(combined_df['store_close'])
         combined_df = combined_df.sort_values(by=['score', 'units_y'], ascending=False)
-        if not combined_df.empty:
+        if not combined_df.empty and combined_df['score'].max() > 0:
             idx = combined_df.at[combined_df.first_valid_index(),'index']
             tote = Tote(id=idx, totes_df=totes_df, allocated=True)
             pw.add_to_queue(tote)
@@ -103,7 +106,7 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
             totes_assigned.append(idx)
         start = print_timer(debug, start, 'Score SKUs')
 
-    if not totes_assigned:
+    if not totes_assigned and totes_needed > 0:
         print('No cartons found for  assignment')
     return totes_assigned
 
@@ -175,10 +178,10 @@ def pass_to_pw(debug, tote, put_walls, orders_df, pw_id, totes_df):
     for pw, _ in pw_list[:18]:
         alloc = put_walls[pw].get_allocation()
         if tote.sku in alloc.index:
-            if (alloc.at[tote.sku, 'units']-alloc.at[tote.sku, 'alloc_qty'])/tote.quantity > .25:
-                put_walls[pw].add_to_queue(tote)
-                allocate_tote_to_pw(totes_df, put_walls[pw], orders_df, tote)
-                return True
+            if (alloc.at[tote.sku, 'units']-alloc.at[tote.sku, 'alloc_qty'])/(tote.quantity - tote.alloc_qty) > .25:
+                if allocate_tote_to_pw(totes_df, put_walls[pw], orders_df, tote):
+                    put_walls[pw].add_to_queue(tote)
+                    return True
     return False
 
 def allocate_tote_to_pw(totes_df, pw, orders_df, tote):
@@ -191,16 +194,22 @@ def allocate_tote_to_pw(totes_df, pw, orders_df, tote):
             order_units = orders_df.at[(order_id, tote.sku), 'units']
             if order_units - order_alloc == 0:
                 continue
-            alloc = min(tote.quantity - tote.alloc_qty, order_units - order_alloc)
+            alloc = min(tote.quantity - tote.alloc_qty,
+                        order_units - order_alloc,
+                        pw.slots[order_ids[order_id]].capacity - pw.slots[order_ids[order_id]].quantity - pw.slots[order_ids[order_id]].alloc_qty)
             tote.alloc_qty += alloc
+            pw.slots[order_ids[order_id]].alloc_qty += alloc
+            pw.slots[order_ids[order_id]].allocate(tote.sku, alloc)
             order_alloc += alloc
             orders_df.at[(order_id, tote.sku), 'alloc_qty'] += alloc
-    totes_df.at[tote.id, 'alloc_qty'] += tote.alloc_qty
-    totes_df.at[tote.id, 'allocated'] = True
     if tote.alloc_qty == 0:
-        print('WTF?')
+        return False
+    totes_df.at[tote.id, 'alloc_qty'] = tote.alloc_qty
+    totes_df.at[tote.id, 'allocated'] = True
+    return True
 
 def allocate_order_to_pw(totes_df, pw, orders_df, order_id):
+    order_ids = pw.get_orders()
     for tote in pw.queue:
         if tote.quantity - tote.alloc_qty == 0:
             continue
@@ -209,6 +218,8 @@ def allocate_order_to_pw(totes_df, pw, orders_df, order_id):
             order_units = orders_df.at[(order_id, tote.sku), 'units']
             alloc = min(tote.quantity - tote.alloc_qty, order_units - order_alloc)
             tote.alloc_qty += alloc
+            pw.slots[order_ids[order_id]].alloc_qty += alloc
+            pw.slots[order_ids[order_id]].allocate(tote.sku, alloc)
             order_alloc += alloc
             orders_df.at[(order_id, tote.sku), 'alloc_qty'] += alloc
-        totes_df.at[tote.id, 'alloc_qty'] += tote.alloc_qty
+        totes_df.at[tote.id, 'alloc_qty'] = tote.alloc_qty

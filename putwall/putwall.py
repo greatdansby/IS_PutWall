@@ -47,7 +47,7 @@ class PutWall:
         print_timer(self.debug, start, 'allocate_queue_to_orders')
 
     def get_orders(self):
-        return [s.order for s in self.slots.values() if s.order is not None]
+        return {s.order: s.id for s in self.slots.values() if s.order is not None}
 
     def get_totes(self):
         return [t.id for t in self.queue]
@@ -58,14 +58,17 @@ class PutWall:
         # TODO generalize fill fucntion and allow override
         log = []
         tote = None
-
         for n in range(min(num_to_process, len(self.queue))):
 
             obj = self.queue.pop(0)
             if type(obj) == Tote:
                 tote = obj
+                if self.id == 53:
+                    print('Debug')
                 for slot in self.find_slots(sku=tote.sku):
-                    qty_allocated = self.orders_df.at[(slot.order, tote.sku), 'units']
+                    if slot.order == 'ST0833':
+                        print('Debug')
+                    qty_allocated = slot.get_allocation(tote.sku)
                     qty_remaining = tote.quantity
                     qty_available = slot.capacity - slot.quantity
                     qty_moved = min(qty_allocated, qty_remaining, qty_available)
@@ -80,7 +83,7 @@ class PutWall:
                                 'putwall': self.id,
                                 'loop': loop})
 
-                    slot.update_quantity(qty=qty_moved)
+                    slot.update_quantity(sku=tote.sku, qty=qty_moved)
                     order_closed = order_handler.deplete_inv(order=slot.order, sku=tote.sku, quantity=qty_moved) #TODO not crazy about this
                     tote = tote.update_quantity(-qty_moved)
                     if slot.capacity - slot.quantity == 0 or order_closed:
@@ -101,7 +104,9 @@ class PutWall:
         return [slot for slot in self.slots.values() if slot.is_clear()]
 
     def find_slots(self, sku=None):
-        order_list = [(slot.order, sku) for slot in self.slots.values() if slot.order is not None]
+        #TODO remove df
+        order_list = [(slot.order, sku) for slot in self.slots.values()
+                      if slot.order is not None and slot.get_allocation(sku) > 0]
         if order_list:
             filtered_order_list = self.orders_df.loc[self.orders_df.index.isin(order_list) &
                                                      (self.orders_df['units'] > 0)].index.get_level_values(0)
@@ -109,6 +114,7 @@ class PutWall:
         return pd.DataFrame()
 
     def get_allocation(self):
+        #TODO remove df
         order_list = [slot.order for slot in self.slots.values() if slot.order is not None]
         if order_list:
             return self.orders_df.loc[order_list].groupby('sku').sum()
@@ -116,11 +122,13 @@ class PutWall:
 
 
 class PutSlot:
-    def __init__(self, id, capacity=0, quantity=0, active=False, order=None):
+    def __init__(self, id, capacity=0, quantity=0, active=False, order=None, alloc_qty=0):
         self.id = id
         self.active = active
         self.capacity = capacity
         self.quantity = quantity
+        self.alloc_qty = alloc_qty
+        self.alloc_lines = {}
         self.order = order
 
     def is_clear(self, clear_func=None):
@@ -133,15 +141,15 @@ class PutSlot:
         self.quantity = 0
 
     def get_allocation(self, sku):
-        #TODO refactor
-        if self.alloc_lines:
-            return sum([l.quantity for l in self.alloc_lines if l.sku == sku])
+        if sku in self.alloc_lines:
+            return self.alloc_lines[sku]
         return 0
 
-    def update_quantity(self, qty):
-        #TODO refactor
+    def update_quantity(self, sku, qty):
         if self.quantity + qty <= self.capacity:
             self.quantity += qty
+            self.alloc_qty -= qty
+            self.alloc_lines[sku] -= qty
         else:
             print('Put slot {} is full, cannot add to quantity'.format(self.id))
             raise Exception
@@ -155,6 +163,12 @@ class PutSlot:
             else:
                 print('Cannot change allocation to a negative')
                 raise Exception
+
+    def allocate(self, sku, qty):
+        if sku in self.alloc_lines:
+            self.alloc_lines[sku] += qty
+        else:
+            self.alloc_lines[sku] = qty
 
     def assign(self, order, alloc_lines):
         #TODO remove
