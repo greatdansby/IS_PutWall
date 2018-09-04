@@ -1,6 +1,7 @@
 from totes.totes import Tote
 from utilities import print_timer
 import pandas as pd
+import numpy as np
 import time
 
 #TODO Add putwall_manager (future)
@@ -63,7 +64,7 @@ class PutWall:
             obj = self.queue.pop(0)
             if type(obj) == Tote:
                 tote = obj
-                if self.id == 53:
+                if tote.id == 1998:
                     print('Debug')
                 for slot in self.find_slots(sku=tote.sku):
                     if slot.order == 'ST0833':
@@ -94,8 +95,8 @@ class PutWall:
                         tote = None
                         break
 
-        if log == []:
-            print('No fulfillment')
+            if log == []:
+                print('No fulfillment: {}-{}'.format(tote.id, self.id))
 
         print_timer(self.debug, start, 'fill_from_queue')
         return tote, log

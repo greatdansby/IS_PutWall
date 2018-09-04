@@ -16,7 +16,7 @@ ItemMaster_table = 'dbo.tblItemMaster'
 
 
 def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_New',
-              date='01/23/2017', output_file='output.csv'):
+              date='01/23/2017', output_file='low_vol_results.csv'):
     #Max day 5/11/2017 @ dbo.Burlington0501to0511
 # Setup
     debug = False
@@ -47,7 +47,6 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                              load_from_db=initialize,
                              data_filename='data.h5',
                              index=['store', 'sku'])
-    order_handler = Order_Handler(orders_df)
 
 # Initialize item_master & inventory
     sql = '''select sku,
@@ -84,6 +83,12 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
     item_master_df['active'] = item_master_df.index.isin(sku_list)
     inventory_df['active'] = item_master_df.index.isin(sku_list)
 
+    #Fragile SKUs to own orders
+    # sku_list = np.random.choice(item_master_df.index, size=int(len(item_master_df) * .05))
+    # orders_df.reset_index(inplace=True)
+    # orders_df.loc[orders_df['sku'].isin(sku_list), 'store'] = orders_df.loc[orders_df['sku'].isin(sku_list), 'store'] + '_f'
+    # orders_df = orders_df.groupby(['store', 'sku']).sum()
+    order_handler = Order_Handler(orders_df)
     start = print_timer(debug, start, 'Initialized item master & inventory')
 
 # Split inventory into full totes
@@ -105,7 +110,11 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
     tote_returns = 0
     tote_passes = 0
     loop = 0
-    output = []
+    output = csv.DictWriter(open(output_file, 'w'), fieldnames=['quantity', 'sku', 'carton_id',
+                                'order', 'putwall', 'loop'])
+    output.writeheader()
+    output = csv.DictWriter(open(output_file, 'a'), fieldnames=['quantity', 'sku', 'carton_id',
+                                                                  'order', 'putwall', 'loop'])
     initial_units = orders_df['units'].sum()
 
     while orders_df['units'].sum() > 0:
@@ -130,9 +139,12 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
 
             if loop > 5:
                 tote, log = pw.fill_from_queue(num_to_process=1, loop=loop, order_handler=order_handler)
-                output.extend(log)
+                output.writerows(log)
 
                 if tote: #If carton didn't pick clean, pass it or return it.
+                    tote.alloc_qty = 0
+                    tote.alloc_lines = {}
+                    tote.allocated = False
                     totes_df.at[tote.id, 'allocated'] = False
                     if pass_to_pw(debug=debug, tote=tote, put_walls=put_walls, orders_df=orders_df,
                                   pw_id=pw.id, totes_df=totes_df):
@@ -140,11 +152,11 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                     else:
                         tote_returns += 1
 
-            carton_ids = assign_totes(debug=debug, pw=pw, totes_df=totes_df,
+            carton_ids, need_skus = assign_totes(debug=debug, pw=pw, totes_df=totes_df,
                                       num_to_assign=1, orders_df=orders_df)
             tote_pulls += len(carton_ids)
 
-            if not carton_ids and loop > 1:
+            if need_skus and loop > 1:
 # Release more SKUs
                 inactive_skus = item_master_df.loc[item_master_df.active == False].index
                 if len(inactive_skus) > 0:
@@ -152,7 +164,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                     item_master_df.loc[sku_list, 'active'] = True
                     totes_df = totes_df.append(split_inv_to_tote(inventory_df, sku_list), ignore_index=True)
 
-                start = print_timer(debug, start, 'Release more SKUs')
+                start = print_timer(True, start, 'Release more SKUs')
 
 # Save output to file
     file = open(output_file, 'w')
@@ -173,4 +185,4 @@ if __name__ == '__main__':
     parser.add_argument('--num_putwalls', '-n', type=int)
     parser.add_argument('--num_slot_per_wall', '-s', type=int)
     args = parser.parse_args()
-    run_model(**vars(args))
+    run_model(**{k: v for k,v in args.__dict__.items() if v is not None})

@@ -31,7 +31,7 @@ class Order_Handler:
         elif current_inv == quantity:
             return self.close_line(order=order, sku=sku)
         else:
-            print('Error: Cannot create negative inventory')
+            print('Error: Cannot create negative inventory: {}-{}'.format(order, sku))
             raise Exception
 
     def close_line(self, order, sku):
