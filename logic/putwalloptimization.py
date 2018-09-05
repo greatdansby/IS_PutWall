@@ -39,7 +39,7 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
             allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
         else:
             top_stores = get_store_affinity(debug=debug, pw=pw, orders_df=orders_df)
-            if len(top_stores) > n:
+            if len(top_stores) >= n:
                 slot.order = top_stores[n]
                 slot.alloc_lines = {}
                 slot.active = True
@@ -51,8 +51,11 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
                     slot.order = order_list.sort_values(by='units').index[n]
                     slot.alloc_lines = {}
                     slot.active = True
+                    slot.capacity = np.random.randint(25, 35)
                     allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
     start = print_timer(debug, start, 'assign_stores')
+
+
 def pick_clean(alloc, row):
     return alloc[row['sku']]/alloc['quantity'] >= 1
 

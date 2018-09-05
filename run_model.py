@@ -160,7 +160,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
 # Release more SKUs
                 inactive_skus = item_master_df.loc[item_master_df.active == False].index
                 if len(inactive_skus) > 0:
-                    sku_list = np.random.choice(inactive_skus, size=100) #TODO remove hardcoding
+                    sku_list = np.random.choice(inactive_skus, size=1000) #TODO remove hardcoding
                     item_master_df.loc[sku_list, 'active'] = True
                     totes_df = totes_df.append(split_inv_to_tote(inventory_df, sku_list), ignore_index=True)
                     start = print_timer(True, start, 'Release more SKUs')
