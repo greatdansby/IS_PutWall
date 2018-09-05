@@ -4,8 +4,6 @@
     <list default="true" id="8d119f53-98c0-482a-8303-34259e0376ae" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logic/putwalloptimization.py" beforeDir="false" afterPath="$PROJECT_DIR$/logic/putwalloptimization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/putwall/putwall.py" beforeDir="false" afterPath="$PROJECT_DIR$/putwall/putwall.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_model.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,14 +38,14 @@
         <counts>
           <entry key="Python Console" value="17" />
           <entry key="dummy" value="12" />
-          <entry key="py" value="41596" />
-          <entry key="txt" value="463" />
+          <entry key="py" value="41719" />
+          <entry key="txt" value="503" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="475" />
-          <entry key="Python" value="41613" />
+          <entry key="PLAIN_TEXT" value="515" />
+          <entry key="Python" value="41736" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages">
@@ -60,7 +58,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="471">
@@ -124,8 +122,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="261">
-              <caret line="140" selection-start-line="140" selection-end-line="140" />
+            <state relative-caret-position="534">
+              <caret line="162" column="72" selection-start-line="162" selection-start-column="72" selection-end-line="162" selection-end-column="72" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -133,14 +131,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1848">
-              <caret line="101" column="68" selection-start-line="101" selection-start-column="68" selection-end-line="101" selection-end-column="68" />
+            <state relative-caret-position="609">
+              <caret line="106" selection-start-line="106" selection-end-line="106" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1536110199033" expanded="true" signature="8977:8978" ph="..." />
+                <marker date="1536113277433" expanded="true" signature="9168:9169" ph="..." />
               </folding>
             </state>
           </provider>
@@ -218,9 +216,9 @@
         <option value="$APPLICATION_CONFIG_DIR$/pycharm64.exe.vmoptions" />
         <option value="$PROJECT_DIR$/orders/orders.py" />
         <option value="$PROJECT_DIR$/totes/totes.py" />
+        <option value="$PROJECT_DIR$/putwall/putwall.py" />
         <option value="$PROJECT_DIR$/run_model.py" />
         <option value="$PROJECT_DIR$/logic/putwalloptimization.py" />
-        <option value="$PROJECT_DIR$/putwall/putwall.py" />
       </list>
     </option>
   </component>
@@ -274,7 +272,28 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.run_model (more prioritize tote clean)">
+  <component name="RunManager" selected="Python.run_model (add line count)">
+    <configuration name="run_model (add line count)" type="PythonConfigurationType" factoryName="Python">
+      <module name="PutWallOptimization" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_model.py" />
+      <option name="PARAMETERS" value="-n 65 -s 6 -o lowvol_linecount.csv" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="run_model (more prioritize tote clean)" type="PythonConfigurationType" factoryName="Python">
       <module name="PutWallOptimization" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -338,7 +357,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="run_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="run_model (prioritize tote clean+1k release)" type="PythonConfigurationType" factoryName="Python">
       <module name="PutWallOptimization" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -351,7 +370,28 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_model.py" />
-      <option name="PARAMETERS" value="-n 65 -s 6" />
+      <option name="PARAMETERS" value="-n 65 -s 6 -o lowvol_moretoteclean_1krelease.csv" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run_model (test)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="PutWallOptimization" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_model.py" />
+      <option name="PARAMETERS" value="-n 65 -s 6 -o test.csv" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -363,12 +403,14 @@
       <item itemvalue="Python.run_model (overfill)" />
       <item itemvalue="Python.run_model (prioritize tote clean)" />
       <item itemvalue="Python.run_model (more prioritize tote clean)" />
-      <item itemvalue="Python.run_model" />
+      <item itemvalue="Python.run_model (prioritize tote clean+1k release)" />
+      <item itemvalue="Python.run_model (add line count)" />
+      <item itemvalue="Python.run_model (test)" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.run_model" />
-        <item itemvalue="Python.run_model" />
+        <item itemvalue="Python.run_model (test)" />
+        <item itemvalue="Python.run_model (test)" />
       </list>
     </recent_temporary>
   </component>
@@ -502,7 +544,21 @@
       <option name="project" value="LOCAL" />
       <updated>1536107960304</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="lowvol_moretoteclean">
+      <created>1536110441944</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1536110441944</updated>
+    </task>
+    <task id="LOCAL-00019" summary="lowvol_moretoteclean_1krelease">
+      <created>1536111022775</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1536111022775</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TodoView">
@@ -518,9 +574,9 @@
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.14754099" />
+      <window_info content_ui="combo" id="Project" order="1" weight="0.14754099" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
-      <window_info id="Debug" order="3" weight="0.3289265" />
+      <window_info active="true" id="Debug" order="3" visible="true" weight="0.3289265" />
       <window_info id="Run" order="4" weight="0.34267583" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.3295583" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" weight="0.2797282" />
@@ -576,7 +632,9 @@
     <MESSAGE value="Small fixes" />
     <MESSAGE value="Fixed allocation logic" />
     <MESSAGE value="Log source" />
-    <option name="LAST_COMMIT_MESSAGE" value="Log source" />
+    <MESSAGE value="lowvol_moretoteclean" />
+    <MESSAGE value="lowvol_moretoteclean_1krelease" />
+    <option name="LAST_COMMIT_MESSAGE" value="lowvol_moretoteclean_1krelease" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -588,8 +646,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/logic/putwalloptimization.py</url>
-          <line>48</line>
-          <option name="timeStamp" value="400" />
+          <line>106</line>
+          <option name="timeStamp" value="409" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -603,11 +661,17 @@
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="tote.quantity - tote.alloc_qty" language="Python" />
+        <watch expression="(combined_df[('units','sum')] - combined_df[('alloc_qty','sum')])" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>(combined_df[('units','sum')] - combined_df[('alloc_qty','sum')])</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>tote.quantity - tote.alloc_qty</expression-string>
         <language-id>Python</language-id>
@@ -861,27 +925,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1848">
-          <caret line="101" column="68" selection-start-line="101" selection-start-column="68" selection-end-line="101" selection-end-column="68" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <marker date="1536110199033" expanded="true" signature="8977:8978" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="261">
-          <caret line="140" selection-start-line="140" selection-end-line="140" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/putwall/putwall.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="471">
@@ -891,6 +934,27 @@
             <marker date="1536110308230" expanded="true" signature="1840:1846" ph="..." />
             <marker date="1536110308230" expanded="true" signature="1867:2024" ph="..." />
             <marker date="1536110308230" expanded="true" signature="6541:6642" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="534">
+          <caret line="162" column="72" selection-start-line="162" selection-start-column="72" selection-end-line="162" selection-end-column="72" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="609">
+          <caret line="106" selection-start-line="106" selection-end-line="106" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1536113277433" expanded="true" signature="9168:9169" ph="..." />
           </folding>
         </state>
       </provider>

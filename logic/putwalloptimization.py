@@ -94,16 +94,16 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
         #start = print_timer(debug, start, 'Copy orders')
         sku_demand['remaining_capacity'] = [stores_in_pw[s] for s in sku_demand.index.get_level_values(0)]
         sku_demand['store_close'] = 1*((sku_demand['units'] - sku_demand['alloc_qty']) == sku_demand['remaining_capacity'])
-        sku_demand = sku_demand.groupby('sku').sum()
+        sku_demand = sku_demand.groupby('sku').agg({'units': ['count', 'sum'], 'store_close':['sum'], 'alloc_qty':['sum']})
         #start = print_timer(debug, start, 'Sum demand')
         totes_not_in_queue = totes_df.loc[(totes_df['active'] == True) &
                                           (totes_df['allocated'] == False)]
         combined_df = totes_not_in_queue.reset_index().merge(sku_demand, on='sku').dropna(thresh=5, axis=0)
         #start = print_timer(debug, start, 'Carton join')
 
-        pw_open_demand = (combined_df['units_y'] - combined_df['alloc_qty_y'])
-        combined_df['score'] = pw_open_demand/combined_df['units_x'] + 1*(combined_df['store_close'])
-        combined_df = combined_df.sort_values(by=['score', 'units_y'], ascending=False)
+        pw_open_demand = (combined_df[('units','sum')] - combined_df[('alloc_qty','sum')])
+        combined_df['score'] = pw_open_demand/combined_df['units']*combined_df[('units','count')] + 1*(combined_df[('store_close','sum')])
+        combined_df = combined_df.sort_values(by=['score', ('units','sum')], ascending=False)
         if not combined_df.empty and combined_df['score'].max() > 0:
             idx = combined_df.at[combined_df.first_valid_index(),'index']
             tote = Tote(id=idx, totes_df=totes_df, allocated=True)
