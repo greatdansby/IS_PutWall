@@ -118,6 +118,9 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                                                                   'order', 'putwall', 'loop', 'source'])
     initial_units = orders_df['units'].sum()
 
+    file = open(output_file.partition('.')[0]+'.kill', 'w')
+    file.close()
+
     while orders_df['units'].sum() > 0:
         current_units = orders_df['units'].sum()
         print('Open Units: {}'.format(current_units))
@@ -126,6 +129,16 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
         print('Tote Passes: {}'.format(tote_passes))
         print('Tote Returns: {}'.format(tote_returns))
         loop_time = print_timer(True, loop_time, 'Loop Start: {}'.format(loop))
+
+# End run if kill file is deleted, log tables
+        try:
+            open(output_file.partition('.')[0] + '.kill', 'r')
+        except:
+            data_store = pd.HDFStore(output_file.partition('.')[0] + '.h5')
+            data_store['orders_df'] = orders_df
+            data_store['totes_df'] = totes_df
+            data_store.close()
+            break
         loop += 1
 
 # Process each put_wall in order one at a time

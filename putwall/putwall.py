@@ -83,7 +83,7 @@ class PutWall:
                                 'order': slot.order,
                                 'putwall': self.id,
                                 'loop': loop,
-                                'source':tote.source})
+                                'source': tote.source})
 
                     slot.update_quantity(sku=tote.sku, qty=qty_moved)
                     order_closed = order_handler.deplete_inv(order=slot.order, sku=tote.sku, quantity=qty_moved) #TODO not crazy about this
