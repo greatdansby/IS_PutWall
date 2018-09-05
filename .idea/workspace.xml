@@ -272,8 +272,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.run_model (10xBonus)">
-    <configuration name="run_model (10xBonus)" type="PythonConfigurationType" factoryName="Python">
+  <component name="RunManager" selected="Python.run_model (10xBonus + TopStores">
+    <configuration name="run_model (10xBonus + TopStores" type="PythonConfigurationType" factoryName="Python">
       <module name="PutWallOptimization" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -286,7 +286,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_model.py" />
-      <option name="PARAMETERS" value="-n 65 -s 6 -o lowvol_10xbonus.csv" />
+      <option name="PARAMETERS" value="-n 65 -s 6 -o lowvol_10xbonus_topstores.csv" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -426,7 +426,7 @@
       <item itemvalue="Python.run_model (more prioritize tote clean)" />
       <item itemvalue="Python.run_model (prioritize tote clean+1k release)" />
       <item itemvalue="Python.run_model (add line count)" />
-      <item itemvalue="Python.run_model (10xBonus)" />
+      <item itemvalue="Python.run_model (10xBonus + TopStores" />
       <item itemvalue="Python.run_model (test)" />
     </list>
     <recent_temporary>

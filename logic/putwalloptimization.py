@@ -19,16 +19,17 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
     start = time.time()
     if len(pw.empty_slots()) == 0: return False
     # Get a list of stores with the best affinity to the current put-wall
-    tote_ids = [t.id for t in pw.queue]
-    totes_in_queue = totes_df.iloc[tote_ids]
-    order_ids = [s.order for s in pw.slots.values()]
-    orders_not_in_pw = orders_df.loc[~orders_df.index.get_level_values(0).isin(order_ids)].reset_index(level=0)
-    combined_df = totes_in_queue.join(orders_not_in_pw, on='sku', rsuffix='_order')
-    combined_df['tote_close'] = 1*((combined_df['units_order']-combined_df['alloc_qty_order']) == (combined_df['units']-combined_df['alloc_qty']))
-    combined_df['fulfillment'] = (combined_df['units_order'] - combined_df['alloc_qty_order'])/(combined_df['units']-combined_df['alloc_qty'])
-    combined_df = combined_df.groupby('store').sum()
-    combined_df['score'] = combined_df['fulfillment'] + combined_df['tote_close']*10
-    combined_df = combined_df.sort_values(by=['score'], ascending=False)
+    # tote_ids = [t.id for t in pw.queue]
+    # totes_in_queue = totes_df.iloc[tote_ids]
+    # order_ids = [s.order for s in pw.slots.values()]
+    # orders_not_in_pw = orders_df.loc[~orders_df.index.get_level_values(0).isin(order_ids)].reset_index(level=0)
+    # combined_df = totes_in_queue.join(orders_not_in_pw, on='sku', rsuffix='_order')
+    # combined_df['tote_close'] = 1*((combined_df['units_order']-combined_df['alloc_qty_order']) == (combined_df['units']-combined_df['alloc_qty']))
+    # combined_df['fulfillment'] = (combined_df['units_order'] - combined_df['alloc_qty_order'])/(combined_df['units']-combined_df['alloc_qty'])
+    # combined_df = combined_df.groupby('store').sum()
+    # combined_df['score'] = combined_df['fulfillment'] + combined_df['tote_close']*10
+    # combined_df = combined_df.sort_values(by=['score'], ascending=False)
+    combined_df = pd.DataFrame()
 
     for n, slot in enumerate(pw.empty_slots()[:stores_to_fill]):
         if len(combined_df) > n:
