@@ -24,8 +24,8 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
     order_ids = [s.order for s in pw.slots.values()]
     orders_not_in_pw = orders_df.loc[~orders_df.index.get_level_values(0).isin(order_ids)].reset_index(level=0)
     combined_df = totes_in_queue.join(orders_not_in_pw, on='sku', rsuffix='_order')
-    combined_df['tote_close'] = (combined_df['units_order']-combined_df['alloc_qty_order']) == (combined_df['units']-combined_df['alloc_qty'])
-    combined_df['fulfillment'] = (combined_df['units_order'] - combined_df['alloc_qty_order'])
+    combined_df['tote_close'] = 1*((combined_df['units_order']-combined_df['alloc_qty_order']) == (combined_df['units']-combined_df['alloc_qty']))
+    combined_df['fulfillment'] = (combined_df['units_order'] - combined_df['alloc_qty_order'])/(combined_df['units']-combined_df['alloc_qty'])
     combined_df = combined_df.groupby('store').sum()
     combined_df['score'] = combined_df['fulfillment'] + combined_df['tote_close']
     combined_df = combined_df.sort_values(by=['score'], ascending=False)
@@ -90,7 +90,7 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
         sku_demand = orders_df.loc[orders_df.index.get_level_values(0).isin(stores_in_pw)].copy()
         #start = print_timer(debug, start, 'Copy orders')
         sku_demand['remaining_capacity'] = [stores_in_pw[s] for s in sku_demand.index.get_level_values(0)]
-        sku_demand['store_close'] = (sku_demand['units'] - sku_demand['alloc_qty']) == sku_demand['remaining_capacity']
+        sku_demand['store_close'] = 1*((sku_demand['units'] - sku_demand['alloc_qty']) == sku_demand['remaining_capacity'])
         sku_demand = sku_demand.groupby('sku').sum()
         #start = print_timer(debug, start, 'Sum demand')
         totes_not_in_queue = totes_df.loc[(totes_df['active'] == True) &
@@ -99,7 +99,7 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
         #start = print_timer(debug, start, 'Carton join')
 
         pw_open_demand = (combined_df['units_y'] - combined_df['alloc_qty_y'])
-        combined_df['score'] = 1 - abs(combined_df['units_x']-pw_open_demand)/combined_df['units_x'] + 1*(combined_df['store_close'])
+        combined_df['score'] = pw_open_demand/combined_df['units_x'] + 1*(combined_df['store_close'])
         combined_df = combined_df.sort_values(by=['score', 'units_y'], ascending=False)
         if not combined_df.empty and combined_df['score'].max() > 0:
             idx = combined_df.at[combined_df.first_valid_index(),'index']

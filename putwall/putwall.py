@@ -92,7 +92,7 @@ class PutWall:
                         print('Clearing slot: {}-{}'.format(self.id, slot.id))
                         slot.clear()
                     if tote.quantity == 0:
-                        print('Tote picked clean')
+                        #print('Tote picked clean')
                         tote = None
                         break
 
