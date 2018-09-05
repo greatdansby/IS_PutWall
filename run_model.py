@@ -16,11 +16,12 @@ ItemMaster_table = 'dbo.tblItemMaster'
 
 
 def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_New',
-              date='01/23/2017', output_file='low_vol_results.csv'):
+              date='01/23/2017', output_file='low_vol_overfill_results.csv'):
     #Max day 5/11/2017 @ dbo.Burlington0501to0511
 # Setup
     debug = False
     initialize = False
+    output_file = '{}-{}'.format(int(time.time()), output_file)
     np.random.seed(32)
     start = time.time()
 
@@ -111,10 +112,10 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
     tote_passes = 0
     loop = 0
     output = csv.DictWriter(open(output_file, 'w'), fieldnames=['quantity', 'sku', 'carton_id',
-                                'order', 'putwall', 'loop'])
+                                'order', 'putwall', 'loop', 'source'])
     output.writeheader()
     output = csv.DictWriter(open(output_file, 'a'), fieldnames=['quantity', 'sku', 'carton_id',
-                                                                  'order', 'putwall', 'loop'])
+                                                                  'order', 'putwall', 'loop', 'source'])
     initial_units = orders_df['units'].sum()
 
     while orders_df['units'].sum() > 0:
@@ -139,7 +140,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
 
             if loop > 5:
                 tote, log = pw.fill_from_queue(num_to_process=1, loop=loop, order_handler=order_handler)
-                output.writerows(log)
+                if log: output.writerows(log)
 
                 if tote: #If carton didn't pick clean, pass it or return it.
                     tote.alloc_qty = 0

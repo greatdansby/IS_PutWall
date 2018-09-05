@@ -56,7 +56,7 @@ class PutWall:
     def fill_from_queue(self, num_to_process, loop, order_handler):
 
         start = time.time()
-        # TODO generalize fill fucntion and allow override
+        # TODO generalize fill function and allow override
         log = []
         tote = None
         for n in range(min(num_to_process, len(self.queue))):
@@ -72,7 +72,7 @@ class PutWall:
                     qty_allocated = slot.get_allocation(tote.sku)
                     qty_remaining = tote.quantity
                     qty_available = slot.capacity - slot.quantity
-                    qty_moved = min(qty_allocated, qty_remaining, qty_available)
+                    qty_moved = max(0, min(qty_allocated, qty_remaining, qty_available))
 
                     if qty_moved == 0:
                         print('Warning (fill_from_queue): 0 quantity moved.')
@@ -82,12 +82,13 @@ class PutWall:
                                 'carton_id': tote.id,
                                 'order': slot.order,
                                 'putwall': self.id,
-                                'loop': loop})
+                                'loop': loop,
+                                'source':tote.source})
 
                     slot.update_quantity(sku=tote.sku, qty=qty_moved)
                     order_closed = order_handler.deplete_inv(order=slot.order, sku=tote.sku, quantity=qty_moved) #TODO not crazy about this
                     tote = tote.update_quantity(-qty_moved)
-                    if slot.capacity - slot.quantity == 0 or order_closed:
+                    if slot.capacity - slot.quantity <= 0 or order_closed:
                         print('Clearing slot: {}-{}'.format(self.id, slot.id))
                         slot.clear()
                     if tote.quantity == 0:

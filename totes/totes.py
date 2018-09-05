@@ -8,6 +8,7 @@ class Tote:
         self.allocated = allocated
         self.totes_df = totes_df
         self.totes_df.at[self.id, ['allocated', 'active', 'alloc_qty']] = [allocated, active, alloc_qty]
+        self.source = 'buffer'
 
     def update_quantity(self, quantity):
         self.totes_df.at[self.id, 'units'] += quantity

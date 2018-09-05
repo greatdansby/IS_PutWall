@@ -16,15 +16,15 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
     to be slotted into the active putwall.
     
     '''
-
+    start = time.time()
+    if len(pw.empty_slots()) == 0: return False
     # Get a list of stores with the best affinity to the current put-wall
-    top_stores = get_store_affinity(debug=debug, pw=pw, orders_df=orders_df)
     tote_ids = [t.id for t in pw.queue]
     totes_in_queue = totes_df.iloc[tote_ids]
     order_ids = [s.order for s in pw.slots.values()]
     orders_not_in_pw = orders_df.loc[~orders_df.index.get_level_values(0).isin(order_ids)].reset_index(level=0)
     combined_df = totes_in_queue.join(orders_not_in_pw, on='sku', rsuffix='_order')
-    combined_df['tote_close'] = (combined_df['units_order']-combined_df['alloc_qty_order'])/(combined_df['units']-combined_df['alloc_qty'])
+    combined_df['tote_close'] = (combined_df['units_order']-combined_df['alloc_qty_order']) == (combined_df['units']-combined_df['alloc_qty'])
     combined_df['fulfillment'] = (combined_df['units_order'] - combined_df['alloc_qty_order'])
     combined_df = combined_df.groupby('store').sum()
     combined_df['score'] = combined_df['fulfillment'] + combined_df['tote_close']
@@ -37,20 +37,22 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
             slot.active = True
             slot.capacity = np.random.randint(25, 35)
             allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
-        elif len(top_stores) > n:
-            slot.order = top_stores[n]
-            slot.alloc_lines = {}
-            slot.active = True
-            slot.capacity = np.random.randint(25, 35)
-            allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
         else:
-            order_list = orders_df.loc[orders_df['alloc_qty']==0].groupby('store').sum()
-            if len(order_list) >= n:
-                slot.order = order_list.sort_values(by='units').index[n]
+            top_stores = get_store_affinity(debug=debug, pw=pw, orders_df=orders_df)
+            if len(top_stores) > n:
+                slot.order = top_stores[n]
                 slot.alloc_lines = {}
                 slot.active = True
+                slot.capacity = np.random.randint(25, 35)
                 allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
-
+            else:
+                order_list = orders_df.loc[orders_df['alloc_qty'] == 0].groupby('store').sum()
+                if len(order_list) >= n:
+                    slot.order = order_list.sort_values(by='units').index[n]
+                    slot.alloc_lines = {}
+                    slot.active = True
+                    allocate_order_to_pw(totes_df, pw, orders_df, slot.order)
+    start = print_timer(debug, start, 'assign_stores')
 def pick_clean(alloc, row):
     return alloc[row['sku']]/alloc['quantity'] >= 1
 
@@ -86,15 +88,15 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
             continue
 
         sku_demand = orders_df.loc[orders_df.index.get_level_values(0).isin(stores_in_pw)].copy()
-        start = print_timer(debug, start, 'Copy orders')
+        #start = print_timer(debug, start, 'Copy orders')
         sku_demand['remaining_capacity'] = [stores_in_pw[s] for s in sku_demand.index.get_level_values(0)]
         sku_demand['store_close'] = (sku_demand['units'] - sku_demand['alloc_qty']) == sku_demand['remaining_capacity']
         sku_demand = sku_demand.groupby('sku').sum()
-        start = print_timer(debug, start, 'Sum demand')
+        #start = print_timer(debug, start, 'Sum demand')
         totes_not_in_queue = totes_df.loc[(totes_df['active'] == True) &
                                           (totes_df['allocated'] == False)]
         combined_df = totes_not_in_queue.reset_index().merge(sku_demand, on='sku').dropna(thresh=5, axis=0)
-        start = print_timer(debug, start, 'Carton join')
+        #start = print_timer(debug, start, 'Carton join')
 
         pw_open_demand = (combined_df['units_y'] - combined_df['alloc_qty_y'])
         combined_df['score'] = 1 - abs(combined_df['units_x']-pw_open_demand)/combined_df['units_x'] + 1*(combined_df['store_close'])
@@ -107,11 +109,12 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
             totes_assigned.append(idx)
             if tote.id == 1998 and pw.id == 32:
                 print('Debug')
-        start = print_timer(debug, start, 'Score SKUs')
+        #start = print_timer(debug, start, 'Score SKUs')
 
     if not totes_assigned and totes_needed > 0:
         print('No cartons found for  assignment')
         return totes_assigned, True
+    start = print_timer(debug, start, 'assign_totes')
     return totes_assigned, False
 
 
@@ -186,13 +189,17 @@ def pass_to_pw(debug, tote, put_walls, orders_df, pw_id, totes_df):
                 if pw == 32 and tote.id == 1998:
                     print('debug')
                 if allocate_tote_to_pw(totes_df, put_walls[pw], orders_df, tote):
+                    tote.source = 'pass'
                     put_walls[pw].add_to_queue(tote)
                     return True
+    del tote
     return False
 
 def allocate_tote_to_pw(totes_df, pw, orders_df, tote):
     order_ids = pw.get_orders()
     for order_id in order_ids:
+        if tote.sku == 'LB16459564' and order_id == 'ST0880':
+            print('debug')
         if tote.quantity - tote.alloc_qty == 0:
             break
         if (order_id, tote.sku) in orders_df.index:
@@ -201,10 +208,14 @@ def allocate_tote_to_pw(totes_df, pw, orders_df, tote):
             if order_units - order_alloc == 0:
                 continue
             slot_capacity = pw.slots[order_ids[order_id]].capacity - pw.slots[order_ids[order_id]].quantity - pw.slots[order_ids[order_id]].alloc_qty
-            alloc = min(tote.quantity - tote.alloc_qty,
+            alloc = max(0, min(tote.quantity - tote.alloc_qty,
                         order_units - order_alloc,
-                        slot_capacity)
-            if alloc == slot_capacity: alloc -= int(np.random.randint(100)/100)
+                        slot_capacity))
+            if (slot_capacity > 0 and
+                    (order_units - order_alloc) - slot_capacity <= 3 and
+                    (tote.quantity - tote.alloc_qty) >= (order_units - order_alloc)):
+                alloc = (order_units - order_alloc)
+            #if alloc == slot_capacity: alloc -= int(np.random.randint(100)/100)
             tote.alloc_qty += alloc
             pw.slots[order_ids[order_id]].alloc_qty += alloc
             pw.slots[order_ids[order_id]].allocate(tote.sku, alloc)
