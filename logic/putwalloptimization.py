@@ -27,7 +27,7 @@ def assign_stores(debug, pw, orders_df, totes_df, stores_to_fill=1):
     combined_df['tote_close'] = 1*((combined_df['units_order']-combined_df['alloc_qty_order']) == (combined_df['units']-combined_df['alloc_qty']))
     combined_df['fulfillment'] = (combined_df['units_order'] - combined_df['alloc_qty_order'])/(combined_df['units']-combined_df['alloc_qty'])
     combined_df = combined_df.groupby('store').sum()
-    combined_df['score'] = combined_df['fulfillment'] + combined_df['tote_close']
+    combined_df['score'] = combined_df['fulfillment'] + combined_df['tote_close']*10
     combined_df = combined_df.sort_values(by=['score'], ascending=False)
 
     for n, slot in enumerate(pw.empty_slots()[:stores_to_fill]):
@@ -102,7 +102,7 @@ def assign_totes(debug, totes_df, pw, num_to_assign, orders_df):
         #start = print_timer(debug, start, 'Carton join')
 
         pw_open_demand = (combined_df[('units','sum')] - combined_df[('alloc_qty','sum')])
-        combined_df['score'] = pw_open_demand/combined_df['units']*combined_df[('units','count')] + 1*(combined_df[('store_close','sum')])
+        combined_df['score'] = pw_open_demand/combined_df['units']*combined_df[('units','count')] + 10*(combined_df[('store_close','sum')])
         combined_df = combined_df.sort_values(by=['score', ('units','sum')], ascending=False)
         if not combined_df.empty and combined_df['score'].max() > 0:
             idx = combined_df.at[combined_df.first_valid_index(),'index']

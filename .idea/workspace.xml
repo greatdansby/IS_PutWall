@@ -38,14 +38,14 @@
         <counts>
           <entry key="Python Console" value="17" />
           <entry key="dummy" value="12" />
-          <entry key="py" value="41719" />
-          <entry key="txt" value="503" />
+          <entry key="py" value="41723" />
+          <entry key="txt" value="523" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="515" />
-          <entry key="Python" value="41736" />
+          <entry key="PLAIN_TEXT" value="535" />
+          <entry key="Python" value="41740" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages">
@@ -134,11 +134,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="609">
-              <caret line="106" selection-start-line="106" selection-end-line="106" />
+            <state relative-caret-position="441">
+              <caret line="104" column="102" selection-start-line="104" selection-start-column="102" selection-end-line="104" selection-end-column="102" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1536113277433" expanded="true" signature="9168:9169" ph="..." />
+                <marker date="1536117924956" expanded="true" signature="9172:9173" ph="..." />
               </folding>
             </state>
           </provider>
@@ -272,7 +272,28 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.run_model (add line count)">
+  <component name="RunManager" selected="Python.run_model (10xBonus)">
+    <configuration name="run_model (10xBonus)" type="PythonConfigurationType" factoryName="Python">
+      <module name="PutWallOptimization" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_model.py" />
+      <option name="PARAMETERS" value="-n 65 -s 6 -o lowvol_10xbonus.csv" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="run_model (add line count)" type="PythonConfigurationType" factoryName="Python">
       <module name="PutWallOptimization" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -405,6 +426,7 @@
       <item itemvalue="Python.run_model (more prioritize tote clean)" />
       <item itemvalue="Python.run_model (prioritize tote clean+1k release)" />
       <item itemvalue="Python.run_model (add line count)" />
+      <item itemvalue="Python.run_model (10xBonus)" />
       <item itemvalue="Python.run_model (test)" />
     </list>
     <recent_temporary>
@@ -558,7 +580,14 @@
       <option name="project" value="LOCAL" />
       <updated>1536111022775</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="lowvol_linecount">
+      <created>1536113359039</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1536113359039</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TodoView">
@@ -576,7 +605,7 @@
       <window_info id="Favorites" order="0" side_tool="true" />
       <window_info content_ui="combo" id="Project" order="1" weight="0.14754099" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
-      <window_info active="true" id="Debug" order="3" visible="true" weight="0.3289265" />
+      <window_info id="Debug" order="3" weight="0.3289265" />
       <window_info id="Run" order="4" weight="0.34267583" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.3295583" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" weight="0.2797282" />
@@ -634,7 +663,8 @@
     <MESSAGE value="Log source" />
     <MESSAGE value="lowvol_moretoteclean" />
     <MESSAGE value="lowvol_moretoteclean_1krelease" />
-    <option name="LAST_COMMIT_MESSAGE" value="lowvol_moretoteclean_1krelease" />
+    <MESSAGE value="lowvol_linecount" />
+    <option name="LAST_COMMIT_MESSAGE" value="lowvol_linecount" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -643,11 +673,6 @@
           <url>file://$PROJECT_DIR$/orders/orders.py</url>
           <line>34</line>
           <option name="timeStamp" value="372" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/logic/putwalloptimization.py</url>
-          <line>106</line>
-          <option name="timeStamp" value="409" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -950,11 +975,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/logic/putwalloptimization.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="609">
-          <caret line="106" selection-start-line="106" selection-end-line="106" />
+        <state relative-caret-position="441">
+          <caret line="104" column="102" selection-start-line="104" selection-start-column="102" selection-end-line="104" selection-end-column="102" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <marker date="1536113277433" expanded="true" signature="9168:9169" ph="..." />
+            <marker date="1536117924956" expanded="true" signature="9172:9173" ph="..." />
           </folding>
         </state>
       </provider>
