@@ -9,6 +9,7 @@ class Tote:
         self.totes_df = totes_df
         self.totes_df.at[self.id, ['allocated', 'active', 'alloc_qty']] = [allocated, active, alloc_qty]
         self.source = 'buffer'
+        self.alloc_lines = {}
 
     def update_quantity(self, quantity):
         self.totes_df.at[self.id, 'units'] += quantity
@@ -25,3 +26,14 @@ class Tote:
         self.totes_df.at[self.id, 'allocated'] = 0
         self.allocated = False
         self.alloc_qty = 0
+
+    def allocate(self, order_id, qty):
+        if order_id in self.alloc_lines:
+            self.alloc_lines[order_id] += qty
+        else:
+            self.alloc_lines[order_id] = qty
+
+    def deallocate(self, order_id):
+        if order_id in self.alloc_lines:
+            self.alloc_qty -= self.alloc_lines[order_id]
+            del self.alloc_lines[order_id]

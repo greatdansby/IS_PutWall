@@ -1,5 +1,6 @@
 from totes.totes import Tote
 from utilities import print_timer
+from logic.putwalloptimization import allocate_tote_to_pw
 import pandas as pd
 import numpy as np
 import time
@@ -64,7 +65,8 @@ class PutWall:
             obj = self.queue.pop(0)
             if type(obj) == Tote:
                 tote = obj
-                if tote.id == 1998:
+                allocate_tote_to_pw(self.totes_df, self, self.orders_df, tote)
+                if tote.id == 3477:
                     print('Debug')
                 for slot in self.find_slots(sku=tote.sku):
                     if slot.order == 'ST0833':
@@ -73,6 +75,15 @@ class PutWall:
                     qty_remaining = tote.quantity
                     qty_available = slot.capacity - slot.quantity
                     qty_moved = max(0, min(qty_allocated, qty_remaining, qty_available))
+
+                    # early_late_close = (np.random.randint(1, 100) == 1)*np.random.randint(-5,5)
+                    # if early_late_close > 0:
+                    #     print('Late close')
+                    #     slot.capacity += early_late_close
+                    # elif early_late_close < 0:
+                    #     print('Early close')
+                    #     slot.capacity -= min(slot.capacity - slot.quantity, -early_late_close)
+                    #     qty_moved = min(qty_moved, slot.capacity - slot.quantity)
 
                     if qty_moved == 0:
                         print('Warning (fill_from_queue): 0 quantity moved.')
@@ -88,8 +99,10 @@ class PutWall:
                     slot.update_quantity(sku=tote.sku, qty=qty_moved)
                     order_closed = order_handler.deplete_inv(order=slot.order, sku=tote.sku, quantity=qty_moved) #TODO not crazy about this
                     tote = tote.update_quantity(-qty_moved)
+                    tote.deallocate(order_id=slot.order)
                     if slot.capacity - slot.quantity <= 0 or order_closed:
                         print('Clearing slot: {}-{}'.format(self.id, slot.id))
+                        _ = [t.deallocate(slot.order) for t in self.queue]
                         slot.clear()
                     if tote.quantity == 0:
                         #print('Tote picked clean')

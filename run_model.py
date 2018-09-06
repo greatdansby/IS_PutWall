@@ -46,7 +46,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                              sql=sql,
                              data_name='orders_df',
                              load_from_db=initialize,
-                             data_filename='data.h5',
+                             data_filename='data_store.h5',
                              index=['store', 'sku'])
 
 # Initialize item_master & inventory
@@ -76,7 +76,7 @@ def run_model(num_putwalls=65, num_slot_per_wall=6, order_table='dbo.Outbound_Ne
                                  sql=sql,
                                  data_name='inventory_df',
                                  load_from_db=initialize,
-                                 data_filename='data.h5',
+                                 data_filename='data_store.h5',
                                  index=['sku'])
 
     item_master_df = inventory_df.loc[:, ~inventory_df.columns.isin(['lines', 'units'])].copy()
